@@ -21,8 +21,8 @@ npm -v
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/junaid50905/expert-backend.git
-cd expert-backend
+git clone https://github.com/meetexpertbd/meetexpert-backend.git
+cd meetexpert-backend
 ```
 
 ### Step 2: Install PHP Dependencies
