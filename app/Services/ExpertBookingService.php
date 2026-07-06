@@ -42,7 +42,7 @@ class ExpertBookingService
 
         $now = Carbon::now();
 
-        return $slots->map(function (ExpertAvailabilitySlot $slot) use ($scheduledDate, $bookedSlotIds, $now): array {
+        return $slots->map(function (ExpertAvailabilitySlot $slot) use ($scheduledDate, $bookedSlotIds): array {
             $startsAt = Carbon::parse(
                 $scheduledDate->toDateString().' '.$slot->start_time->format('H:i:s')
             );

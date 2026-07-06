@@ -13,8 +13,7 @@ class ExpertApplicationController extends Controller
 {
     public function __construct(
         private ExpertApplicationService $expertApplicationService
-    ) {
-    }
+    ) {}
 
     public function store(StoreExpertApplicationRequest $request): JsonResponse
     {

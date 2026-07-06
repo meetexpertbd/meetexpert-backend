@@ -13,13 +13,13 @@ class AuthService
     {
         $record = RegistrationOtp::where('email', $email)->first();
 
-        if (!$record || !$record->verified_at) {
+        if (! $record || ! $record->verified_at) {
             throw ValidationException::withMessages([
                 'email' => ['Email must be verified with OTP before completing registration.'],
             ]);
         }
 
-        if (!$record->verification_expires_at || $record->verification_expires_at->isPast()) {
+        if (! $record->verification_expires_at || $record->verification_expires_at->isPast()) {
             throw ValidationException::withMessages([
                 'email' => ['Verification expired. Please restart registration.'],
             ]);
@@ -48,7 +48,7 @@ class AuthService
     {
         $user = User::where('email', $email)->first();
 
-        if (!$user || !Hash::check($password, $user->password)) {
+        if (! $user || ! Hash::check($password, $user->password)) {
             return null;
         }
 
