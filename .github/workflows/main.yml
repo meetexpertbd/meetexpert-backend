@@ -18,7 +18,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.3"
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, intl
           tools: composer:v2
           coverage: none
@@ -32,8 +32,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-php-8.2-composer-${{ hashFiles('composer.lock') }}
-          restore-keys: ${{ runner.os }}-php-8.2-composer-
+          key: ${{ runner.os }}-php-8.3-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-php-8.3-composer-
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -50,7 +50,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.3"
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, intl
           tools: composer:v2
           coverage: none
@@ -59,8 +59,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-php-8.2-composer-${{ hashFiles('composer.lock') }}
-          restore-keys: ${{ runner.os }}-php-8.2-composer-
+          key: ${{ runner.os }}-php-8.3-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-php-8.3-composer-
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
@@ -102,7 +102,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.3"
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, intl
           tools: composer:v2
           coverage: none
@@ -111,8 +111,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-php-8.2-composer-${{ hashFiles('composer.lock') }}
-          restore-keys: ${{ runner.os }}-php-8.2-composer-
+          key: ${{ runner.os }}-php-8.3-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-php-8.3-composer-
 
       - name: Install production dependencies
         run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader --no-progress
