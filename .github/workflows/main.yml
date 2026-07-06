@@ -139,6 +139,6 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: 22
-          local_path: ./
-          remote_path: ${{ secrets.REMOTE_PATH }}
+          local_path: ./*
+          remote_path: ${{ secrets.REMOTE_PATH || 'public_html/' }}
           sftp_only: true
