@@ -82,7 +82,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           cache: npm
 
       - name: Install npm dependencies
@@ -120,7 +120,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           cache: npm
 
       - name: Build frontend assets
@@ -136,7 +136,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: 21
           protocol: ftps
-          server-dir: /public_html/
+          server-dir: ${{ secrets.FTP_SERVER_DIR || './' }}
           local-dir: ./
           exclude: |
             **/.git*
