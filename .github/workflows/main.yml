@@ -128,22 +128,17 @@ jobs:
           npm ci
           npm run build
 
-      - name: Deploy via FTPS
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      - name: Prepare files for deploy
+        run: |
+          rm -rf node_modules .git .github tests
+
+      - name: Deploy via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.5
         with:
           server: ${{ secrets.SERVER }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          port: 21
-          protocol: ftps
-          server-dir: ${{ secrets.FTP_SERVER_DIR || './' }}
-          local-dir: ./
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/.github/**
-            **/node_modules/**
-            **/tests/**
-            **/.env
-            **/.env.*
-            !**/.env.example
+          port: 22
+          local_path: ./
+          remote_path: ${{ secrets.REMOTE_PATH }}
+          sftp_only: true
