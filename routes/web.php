@@ -74,5 +74,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('users', [UsersWebController::class, 'index'])
             ->name('admin.users.index');
+        Route::get('all-users', [UsersWebController::class, 'allTypes'])
+            ->name('admin.all-users.index');
+        Route::post('all-users/{user}/make-admin', [UsersWebController::class, 'makeAdmin'])
+            ->name('admin.all-users.make-admin');
     });
 });

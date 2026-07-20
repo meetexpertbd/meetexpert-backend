@@ -51,6 +51,13 @@ class MenuHelper
                 'matchPathPrefix' => '/admin/users',
                 'admin_only' => true,
             ],
+            [
+                'icon' => 'users',
+                'name' => 'All types users',
+                'path' => '/admin/all-users',
+                'matchPathPrefix' => '/admin/all-users',
+                'admin_only' => true,
+            ],
             /* [
                 'icon' => 'authentication',
                 'name' => 'Authentication',
