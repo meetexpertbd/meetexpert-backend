@@ -56,7 +56,6 @@ class MenuHelper
                 'name' => 'All types users',
                 'path' => '/admin/all-users',
                 'matchPathPrefix' => '/admin/all-users',
-                'admin_only' => true,
             ],
             /* [
                 'icon' => 'authentication',
@@ -93,7 +92,7 @@ class MenuHelper
         $user = auth()->user();
 
         return array_values(array_filter($items, function (array $item) use ($user) {
-            if (! empty($item['admin_only']) && (! $user || $user->user_type !== User::USER_TYPE_ADMIN)) {
+            if (!empty($item['admin_only']) && (!$user || $user->user_type !== User::USER_TYPE_ADMIN)) {
                 return false;
             }
 
