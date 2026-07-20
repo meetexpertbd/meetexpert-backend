@@ -2,13 +2,13 @@
 
 @section('content')
     <div>
-        <x-common.page-breadcrumb pageTitle="All types users" />
+        <x-common.page-breadcrumb pageTitle="All types of users" />
 
         <div class="mb-6">
             <p class="text-sm text-gray-500 dark:text-gray-400">All accounts from the users table, including admins, experts, and standard users.</p>
         </div>
 
-        <x-common.component-card title="All types users">
+        <x-common.component-card title="All types of users">
             <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                     <thead class="bg-gray-50 dark:bg-white/[0.03]">
