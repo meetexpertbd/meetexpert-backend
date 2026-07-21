@@ -24,9 +24,9 @@ jobs:
             echo "Installing Composer dependencies..."
             composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
             echo "Installing npm dependencies..."
-            npm install -f
+            sudo npm install -f
             echo "Building frontend assets..."
-            npm run build
+            sudo npm run build
             echo "Running database migrations..."
             php8.3 artisan migrate --force
             echo "Clearing Laravel optimization cache..."
