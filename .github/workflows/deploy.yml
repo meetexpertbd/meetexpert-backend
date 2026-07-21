@@ -1,63 +1,34 @@
-
 name: Deploy Laravel Backend
-
 on:
   push:
     branches:
       - main
-
   workflow_dispatch:
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-
-          echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-          ssh-keyscan -p "${{ secrets.PROD_SSH_PORT }}" \
-            -H "${{ secrets.PROD_HOST }}" >> ~/.ssh/known_hosts
-
       - name: Deploy to production server
-        run: |
-          ssh \
-            -i ~/.ssh/id_rsa \
-            -p "${{ secrets.PROD_SSH_PORT }}" \
-            "${{ secrets.PROD_SSH_USER }}@${{ secrets.PROD_HOST }}" << 'EOF'
-
-          set -e
-
-          cd /var/www/meetexpert-backend
-
-          echo "Pulling latest code..."
-          git fetch origin
-          git reset --hard origin/main
-
-          echo "Installing Composer dependencies..."
-          composer install \
-            --no-dev \
-            --prefer-dist \
-            --no-interaction \
-            --optimize-autoloader
-
-          echo "Installing npm dependencies..."
-          npm install
-
-          echo "Building frontend assets..."
-          npm run build
-
-          echo "Running database migrations..."
-          php8.3 artisan migrate --force
-
-          echo "Clearing Laravel optimization cache..."
-          php8.3 artisan optimize:clear
-
-          echo "Deployment completed successfully."
-
-          exit 0
-          EOF
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_SSH_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_SSH_PORT }}
+          script: |
+            set -e
+            cd /var/www/meetexpert-backend
+            echo "Pulling latest code..."
+            git fetch origin
+            git reset --hard origin/main
+            echo "Installing Composer dependencies..."
+            composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+            echo "Installing npm dependencies..."
+            npm install
+            echo "Building frontend assets..."
+            npm run build
+            echo "Running database migrations..."
+            php8.3 artisan migrate --force
+            echo "Clearing Laravel optimization cache..."
+            php8.3 artisan optimize:clear
+            echo "Deployment completed successfully."
