@@ -15,6 +15,7 @@ use App\Services\AuthService;
 use App\Services\RegistrationOtpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use OpenApi\Attributes as OA;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class AuthController extends Controller
@@ -24,6 +25,24 @@ class AuthController extends Controller
         private AuthService $authService
     ) {}
 
+    #[OA\Post(
+        path: '/api/v1/auth/register/email',
+        tags: ['Authentication'],
+        summary: 'Send a registration OTP',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'OTP sent'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
     public function registerEmail(RegisterEmailRequest $request): JsonResponse
     {
         $this->registrationOtpService->requestOtp($request->validated('email'));
@@ -31,6 +50,25 @@ class AuthController extends Controller
         return ApiResponse::success('OTP sent to your email.', null);
     }
 
+    #[OA\Post(
+        path: '/api/v1/auth/register/verify-otp',
+        tags: ['Authentication'],
+        summary: 'Verify a registration OTP',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'otp'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                    new OA\Property(property: 'otp', type: 'string', pattern: '^[0-9]{4}$', example: '1234'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'OTP verified'),
+            new OA\Response(response: 422, description: 'Invalid OTP or validation error'),
+        ]
+    )]
     public function verifyOtp(VerifyOtpRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -39,6 +77,26 @@ class AuthController extends Controller
         return ApiResponse::success('OTP verified. You can complete registration.', null);
     }
 
+    #[OA\Post(
+        path: '/api/v1/auth/register/complete',
+        tags: ['Authentication'],
+        summary: 'Complete registration',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'password', 'password_confirmation'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                    new OA\Property(property: 'password', type: 'string', format: 'password', minLength: 6),
+                    new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 201, description: 'Registration completed'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
     public function completeRegistration(CompleteRegistrationRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -56,6 +114,25 @@ class AuthController extends Controller
         ], 201);
     }
 
+    #[OA\Post(
+        path: '/api/v1/auth/register/resend-otp',
+        tags: ['Authentication'],
+        summary: 'Resend a registration OTP',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'OTP resent'),
+            new OA\Response(response: 429, description: 'Too many requests'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
     public function resendOtp(ResendOtpRequest $request): JsonResponse
     {
         try {
@@ -67,6 +144,26 @@ class AuthController extends Controller
         return ApiResponse::success('A new OTP has been sent to your email.', null);
     }
 
+    #[OA\Post(
+        path: '/api/v1/auth/login',
+        tags: ['Authentication'],
+        summary: 'Login with email and password',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'password'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                    new OA\Property(property: 'password', type: 'string', format: 'password'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Login successful'),
+            new OA\Response(response: 401, description: 'Invalid credentials'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
     public function login(LoginRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -83,6 +180,16 @@ class AuthController extends Controller
         ]);
     }
 
+    #[OA\Post(
+        path: '/api/v1/auth/logout',
+        tags: ['Authentication'],
+        summary: 'Logout the current user',
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Logged out'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+        ]
+    )]
     public function logout(Request $request): JsonResponse
     {
         $request->user()?->currentAccessToken()?->delete();
@@ -90,6 +197,16 @@ class AuthController extends Controller
         return ApiResponse::success('Logged out successfully.', null);
     }
 
+    #[OA\Get(
+        path: '/api/v1/profile',
+        tags: ['Authentication'],
+        summary: 'Get the authenticated user profile',
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Profile retrieved'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+        ]
+    )]
     public function profile(Request $request): JsonResponse
     {
         $user = $request->user();

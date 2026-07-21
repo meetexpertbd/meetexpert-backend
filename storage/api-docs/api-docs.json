@@ -1,0 +1,882 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "MeetExpert API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Local server"
+        }
+    ],
+    "paths": {
+        "/api/v1/auth/register/email": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Send a registration OTP",
+                "operationId": "fe64342d20f463965fec5ecbb5370ae7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register/verify-otp": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify a registration OTP",
+                "operationId": "dafc249be76cafc9d14d9b6c7dc57f47",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    },
+                                    "otp": {
+                                        "type": "string",
+                                        "pattern": "^[0-9]{4}$",
+                                        "example": "1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP verified"
+                    },
+                    "422": {
+                        "description": "Invalid OTP or validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register/complete": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Complete registration",
+                "operationId": "e8bd719d6d104edc511fcaafbaa729e7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 6
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registration completed"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register/resend-otp": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Resend a registration OTP",
+                "operationId": "1f12cec8d90c75f3256ffd70c50b8f24",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP resent"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login with email and password",
+                "operationId": "a7997e7c1e3bfed64d4e56de82415931",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout the current user",
+                "operationId": "f6b8957b4c0b25636613a9f0512a8ba9",
+                "responses": {
+                    "200": {
+                        "description": "Logged out"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/profile": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get the authenticated user profile",
+                "operationId": "81ed28f57d61755a7f732c19d37144ec",
+                "responses": {
+                    "200": {
+                        "description": "Profile retrieved"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/expert/application": {
+            "post": {
+                "tags": [
+                    "Expert Application"
+                ],
+                "summary": "Submit an expert application",
+                "operationId": "a1e6555478e90f2c7146171e29909a23",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "subcategory_id",
+                                    "professional_headline",
+                                    "bio",
+                                    "skill_ids"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "type": "integer"
+                                    },
+                                    "subcategory_id": {
+                                        "type": "integer"
+                                    },
+                                    "professional_headline": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "bio": {
+                                        "type": "string",
+                                        "maxLength": 10000
+                                    },
+                                    "education": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "institution"
+                                            ],
+                                            "properties": {
+                                                "institution": {
+                                                    "type": "string",
+                                                    "maxLength": 255
+                                                },
+                                                "degree": {
+                                                    "type": "string",
+                                                    "nullable": true,
+                                                    "maxLength": 255
+                                                },
+                                                "year": {
+                                                    "type": "integer",
+                                                    "nullable": true,
+                                                    "maximum": 2100,
+                                                    "minimum": 1900
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true,
+                                        "maxItems": 20
+                                    },
+                                    "experience": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "title"
+                                            ],
+                                            "properties": {
+                                                "title": {
+                                                    "type": "string",
+                                                    "maxLength": 255
+                                                },
+                                                "organization": {
+                                                    "type": "string",
+                                                    "nullable": true,
+                                                    "maxLength": 255
+                                                },
+                                                "start_year": {
+                                                    "type": "integer",
+                                                    "nullable": true,
+                                                    "maximum": 2100,
+                                                    "minimum": 1900
+                                                },
+                                                "end_year": {
+                                                    "type": "integer",
+                                                    "nullable": true,
+                                                    "maximum": 2100,
+                                                    "minimum": 1900
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "nullable": true,
+                                                    "maxLength": 2000
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true,
+                                        "maxItems": 30
+                                    },
+                                    "portfolio": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "url"
+                                            ],
+                                            "properties": {
+                                                "title": {
+                                                    "type": "string",
+                                                    "nullable": true,
+                                                    "maxLength": 255
+                                                },
+                                                "url": {
+                                                    "type": "string",
+                                                    "format": "uri",
+                                                    "maxLength": 2048
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true,
+                                        "maxItems": 20
+                                    },
+                                    "skill_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "maxItems": 50,
+                                        "minItems": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Application submitted"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/expert/availability": {
+            "get": {
+                "tags": [
+                    "Expert Availability"
+                ],
+                "summary": "Get the authenticated expert’s weekly availability",
+                "operationId": "5982b5479752582670e596c4c3cdfa0b",
+                "responses": {
+                    "200": {
+                        "description": "Availability retrieved"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Expert account required"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Expert Availability"
+                ],
+                "summary": "Replace the authenticated expert’s weekly availability",
+                "operationId": "0e1e1d4db20f237645e58407057f5c4b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "days"
+                                ],
+                                "properties": {
+                                    "days": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "day_of_week",
+                                                "enabled"
+                                            ],
+                                            "properties": {
+                                                "day_of_week": {
+                                                    "type": "integer",
+                                                    "maximum": 6,
+                                                    "minimum": 0
+                                                },
+                                                "enabled": {
+                                                    "type": "boolean"
+                                                },
+                                                "slots": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "required": [
+                                                            "start",
+                                                            "end"
+                                                        ],
+                                                        "properties": {
+                                                            "start": {
+                                                                "type": "string",
+                                                                "format": "time",
+                                                                "example": "09:00"
+                                                            },
+                                                            "end": {
+                                                                "type": "string",
+                                                                "format": "time",
+                                                                "example": "10:00"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "nullable": true,
+                                                    "maxItems": 20
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "maxItems": 7,
+                                        "minItems": 7
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Availability saved"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Expert account required"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookings": {
+            "get": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "List the authenticated user’s bookings",
+                "operationId": "7933019865bb09f068e7edff4cb5ffe8",
+                "parameters": [
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bookings retrieved"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Book an expert",
+                "operationId": "30c377ac406477a04926fe80b285047a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "expert_id",
+                                    "availability_slot_id",
+                                    "date"
+                                ],
+                                "properties": {
+                                    "expert_id": {
+                                        "type": "integer"
+                                    },
+                                    "availability_slot_id": {
+                                        "type": "integer"
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "maxLength": 2000
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Expert booked"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Account cannot create bookings"
+                    },
+                    "422": {
+                        "description": "Validation error or unavailable slot"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookings/{booking}": {
+            "get": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Get a booking",
+                "operationId": "8e7036e5763eef365bd76d7778f9bd6a",
+                "parameters": [
+                    {
+                        "name": "booking",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking retrieved"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookings/{booking}/cancel": {
+            "post": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Cancel a booking",
+                "operationId": "970e655b065ae801eba7559c0e68eb35",
+                "parameters": [
+                    {
+                        "name": "booking",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking cancelled"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    },
+                    "422": {
+                        "description": "Booking cannot be cancelled"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/bookings/{booking}/meeting": {
+            "get": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Get Agora meeting credentials",
+                "operationId": "ff845721b2a5dd1da35ccbffae87e77c",
+                "parameters": [
+                    {
+                        "name": "booking",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Meeting credentials generated"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Booking not found"
+                    },
+                    "422": {
+                        "description": "Meeting is unavailable"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/experts": {
+            "get": {
+                "tags": [
+                    "Experts"
+                ],
+                "summary": "List approved experts",
+                "operationId": "3f7eee89528e608a1629632cd3f11789",
+                "parameters": [
+                    {
+                        "name": "category_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "subcategory_id",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Experts retrieved"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/experts/{user}": {
+            "get": {
+                "tags": [
+                    "Experts"
+                ],
+                "summary": "Get an approved expert",
+                "operationId": "599f1d7b56c7219145ab02c8b3b74db6",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Expert retrieved"
+                    },
+                    "404": {
+                        "description": "Expert not found"
+                    }
+                }
+            }
+        },
+        "/api/v1/experts/{user}/available-slots": {
+            "get": {
+                "tags": [
+                    "Experts"
+                ],
+                "summary": "List an expert’s available slots for a date",
+                "operationId": "b1a3b335fd273f3b3130c6eb33e09aaf",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Available slots retrieved"
+                    },
+                    "404": {
+                        "description": "Expert not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Laravel Sanctum bearer token",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Expert Application",
+            "description": "Expert Application"
+        },
+        {
+            "name": "Expert Availability",
+            "description": "Expert Availability"
+        },
+        {
+            "name": "Bookings",
+            "description": "Bookings"
+        },
+        {
+            "name": "Experts",
+            "description": "Experts"
+        }
+    ]
+}
