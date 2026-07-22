@@ -12,7 +12,8 @@ Route::prefix('v1')->group(function (): void {
     Route::get('experts/{user}/available-slots', [ExpertController::class, 'availableSlots']);
     Route::get('experts/{user}', [ExpertController::class, 'show']);
     Route::prefix('auth')->group(function (): void {
-        Route::post('register/email', [AuthController::class, 'registerEmail']);
+        Route::post('check-email', [AuthController::class, 'checkEmail']);
+        Route::post('register/email', [AuthController::class, 'checkEmail']);
         Route::post('register/verify-otp', [AuthController::class, 'verifyOtp']);
         Route::post('register/complete', [AuthController::class, 'completeRegistration']);
         Route::post('register/resend-otp', [AuthController::class, 'resendOtp']);

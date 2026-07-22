@@ -16,6 +16,7 @@ class CompleteRegistrationRequest extends FormRequest
     {
         return [
             'email' => ['required', 'string', 'email', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'confirmed', Password::min(6)],
         ];
     }

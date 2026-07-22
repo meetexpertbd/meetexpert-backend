@@ -9,7 +9,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-    public function completeRegistration(string $email, string $password): User
+    public function completeRegistration(string $email, string $name, string $password): User
     {
         $record = RegistrationOtp::where('email', $email)->first();
 
@@ -32,7 +32,7 @@ class AuthService
         }
 
         $user = User::create([
-            'name' => $this->defaultNameFromEmail($email),
+            'name' => $name,
             'email' => $email,
             'password' => $password,
             'user_type' => User::USER_TYPE_USER,
@@ -56,12 +56,5 @@ class AuthService
             'user' => $user,
             'token' => $user->createToken('auth')->plainTextToken,
         ];
-    }
-
-    private function defaultNameFromEmail(string $email): string
-    {
-        $local = strstr($email, '@', true);
-
-        return ($local !== false && $local !== '') ? $local : 'User';
     }
 }

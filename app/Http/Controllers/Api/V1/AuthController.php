@@ -26,9 +26,9 @@ class AuthController extends Controller
     ) {}
 
     #[OA\Post(
-        path: '/api/v1/auth/register/email',
+        path: '/api/v1/auth/check-email',
         tags: ['Authentication'],
-        summary: 'Send a registration OTP',
+        summary: 'Check email and start login or registration',
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -39,15 +39,25 @@ class AuthController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'OTP sent'),
+            new OA\Response(response: 200, description: 'User exists (login) or OTP sent (register)'),
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
-    public function registerEmail(RegisterEmailRequest $request): JsonResponse
+    public function checkEmail(RegisterEmailRequest $request): JsonResponse
     {
-        $this->registrationOtpService->requestOtp($request->validated('email'));
+        $email = $request->validated('email');
 
-        return ApiResponse::success('OTP sent to your email.', null);
+        if (User::where('email', $email)->exists()) {
+            return ApiResponse::success('User found. Please login.', [
+                'action' => 'login',
+            ]);
+        }
+
+        $this->registrationOtpService->requestOtp($email);
+
+        return ApiResponse::success('OTP sent to your email.', [
+            'action' => 'register',
+        ]);
     }
 
     #[OA\Post(
@@ -84,9 +94,10 @@ class AuthController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['email', 'password', 'password_confirmation'],
+                required: ['email', 'name', 'password', 'password_confirmation'],
                 properties: [
                     new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                    new OA\Property(property: 'name', type: 'string', maxLength: 255),
                     new OA\Property(property: 'password', type: 'string', format: 'password', minLength: 6),
                     new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
                 ]
@@ -102,6 +113,7 @@ class AuthController extends Controller
         $validated = $request->validated();
         $user = $this->authService->completeRegistration(
             $validated['email'],
+            $validated['name'],
             $validated['password']
         );
 
