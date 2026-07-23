@@ -18,6 +18,12 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
+            'profile' => $this->when(
+                $this->relationLoaded('profile'),
+                fn () => $this->profile
+                    ? new UserProfileResource($this->profile)
+                    : null
+            ),
             'expert_profile' => $this->when(
                 $this->user_type === User::USER_TYPE_EXPERT && $this->relationLoaded('approvedExpertApplication'),
                 fn () => $this->approvedExpertApplication

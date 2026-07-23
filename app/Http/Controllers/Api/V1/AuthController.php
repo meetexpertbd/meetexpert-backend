@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\UpdateUserProfileRequest;
 use App\Http\Requests\Auth\CompleteRegistrationRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
@@ -18,6 +19,7 @@ use App\Models\User;
 use App\Services\AuthService;
 use App\Services\PasswordResetOtpService;
 use App\Services\RegistrationOtpService;
+use App\Services\UserProfileService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -28,6 +30,7 @@ class AuthController extends Controller
     public function __construct(
         private RegistrationOtpService $registrationOtpService,
         private PasswordResetOtpService $passwordResetOtpService,
+        private UserProfileService $userProfileService,
         private AuthService $authService
     ) {}
 
@@ -35,6 +38,24 @@ class AuthController extends Controller
         path: '/api/v1/auth/check-email',
         tags: ['Authentication'],
         summary: 'Check email and start login or registration',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'User exists (login) or OTP sent (register)'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+    #[OA\Post(
+        path: '/api/v1/auth/register/email',
+        tags: ['Authentication'],
+        summary: 'Alias of check-email (send registration OTP if email is new)',
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -329,27 +350,88 @@ class AuthController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/v1/profile',
-        tags: ['Authentication'],
-        summary: 'Get the authenticated user profile',
+        path: '/api/v1/user/profile',
+        tags: ['User Profile'],
+        summary: 'Get the authenticated regular user profile',
         security: [['sanctum' => []]],
         responses: [
             new OA\Response(response: 200, description: 'Profile retrieved'),
             new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Only regular users can access this profile'),
         ]
     )]
     public function profile(Request $request): JsonResponse
     {
         $user = $request->user();
-        if ($user->user_type === User::USER_TYPE_EXPERT) {
-            $user->load([
-                'approvedExpertApplication.category',
-                'approvedExpertApplication.subcategory',
-                'approvedExpertApplication.skills',
-            ]);
+
+        if ($user->user_type !== User::USER_TYPE_USER) {
+            return ApiResponse::error('Only regular user accounts can access this profile.', null, 403);
         }
 
+        $user->load('profile');
+
         return ApiResponse::success('Profile retrieved.', [
+            'user' => new UserResource($user),
+        ]);
+    }
+
+    #[OA\Post(
+        path: '/api/v1/user/profile',
+        tags: ['User Profile'],
+        summary: 'Update the authenticated regular user profile',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: [
+                new OA\MediaType(
+                    mediaType: 'multipart/form-data',
+                    schema: new OA\Schema(
+                        properties: [
+                            new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female', 'other', 'prefer_not_to_say'], nullable: true),
+                            new OA\Property(property: 'date_of_birth', type: 'string', format: 'date', nullable: true),
+                            new OA\Property(property: 'phone', type: 'string', maxLength: 32, nullable: true),
+                            new OA\Property(property: 'avatar', type: 'string', format: 'binary', nullable: true),
+                            new OA\Property(property: 'present_address', type: 'string', nullable: true),
+                            new OA\Property(property: 'permanent_address', type: 'string', nullable: true),
+                            new OA\Property(property: 'district', type: 'string', nullable: true),
+                            new OA\Property(property: 'country', type: 'string', minLength: 2, maxLength: 2, example: 'BD', nullable: true),
+                            new OA\Property(property: 'preferred_language', type: 'string', enum: ['en', 'bn'], example: 'bn', nullable: true),
+                        ]
+                    )
+                ),
+                new OA\MediaType(
+                    mediaType: 'application/json',
+                    schema: new OA\Schema(
+                        properties: [
+                            new OA\Property(property: 'gender', type: 'string', enum: ['male', 'female', 'other', 'prefer_not_to_say'], nullable: true),
+                            new OA\Property(property: 'date_of_birth', type: 'string', format: 'date', nullable: true),
+                            new OA\Property(property: 'phone', type: 'string', maxLength: 32, nullable: true),
+                            new OA\Property(property: 'present_address', type: 'string', nullable: true),
+                            new OA\Property(property: 'permanent_address', type: 'string', nullable: true),
+                            new OA\Property(property: 'district', type: 'string', nullable: true),
+                            new OA\Property(property: 'country', type: 'string', minLength: 2, maxLength: 2, example: 'BD', nullable: true),
+                            new OA\Property(property: 'preferred_language', type: 'string', enum: ['en', 'bn'], example: 'bn', nullable: true),
+                        ]
+                    )
+                ),
+            ]
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Profile updated'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Only regular users can update this profile'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+    public function updateProfile(UpdateUserProfileRequest $request): JsonResponse
+    {
+        $user = $this->userProfileService->update(
+            $request->user(),
+            $request->safe()->except('avatar'),
+            $request->file('avatar')
+        );
+
+        return ApiResponse::success('Profile updated.', [
             'user' => new UserResource($user),
         ]);
     }

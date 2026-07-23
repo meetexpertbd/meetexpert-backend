@@ -25,7 +25,11 @@ Route::prefix('v1')->group(function (): void {
         Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
     });
     Route::middleware('auth:sanctum')->group(function (): void {
-        Route::get('profile', [AuthController::class, 'profile']);
+        Route::prefix('user')->group(function (): void {
+            Route::get('profile', [AuthController::class, 'profile']);
+            Route::post('profile', [AuthController::class, 'updateProfile']);
+        });
+
         Route::post('expert/application', [ExpertApplicationController::class, 'store']);
         Route::get('expert/availability', [ExpertAvailabilityController::class, 'show']);
         Route::put('expert/availability', [ExpertAvailabilityController::class, 'update']);
