@@ -6,10 +6,13 @@ use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class UserProfileService
 {
+    public function __construct(
+        private FileStorageService $fileStorage
+    ) {}
+
     /**
      * @param  array{
      *     gender?: string|null,
@@ -44,10 +47,11 @@ class UserProfileService
             $profile->fill($profileFields);
 
             if ($avatar !== null) {
-                if ($profile->avatar_path) {
-                    Storage::disk('public')->delete($profile->avatar_path);
-                }
-                $profile->avatar_path = $avatar->store('avatars/'.$user->id, 'public');
+                $this->fileStorage->delete($profile->avatar_path);
+                $profile->avatar_path = $this->fileStorage->store(
+                    $avatar,
+                    'avatars/'.$user->id
+                );
             }
 
             if (! $profile->exists) {

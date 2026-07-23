@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use App\Enums\UserGender;
+use App\Services\FileStorageService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 
 class UserProfile extends Model
 {
@@ -37,10 +37,6 @@ class UserProfile extends Model
 
     public function avatarUrl(): ?string
     {
-        if (! $this->avatar_path) {
-            return null;
-        }
-
-        return Storage::disk('public')->url($this->avatar_path);
+        return app(FileStorageService::class)->url($this->avatar_path);
     }
 }
