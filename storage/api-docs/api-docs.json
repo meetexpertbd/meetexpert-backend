@@ -184,6 +184,174 @@
                 }
             }
         },
+        "/api/v1/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Send a password reset OTP",
+                "operationId": "258f8322e6e587094f858db597dee996",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent"
+                    },
+                    "422": {
+                        "description": "Validation error or account not found"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/forgot-password/verify-otp": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify a password reset OTP",
+                "operationId": "9b5826c66669b350c3a58b9931beb247",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "otp"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    },
+                                    "otp": {
+                                        "type": "string",
+                                        "pattern": "^[0-9]{4}$",
+                                        "example": "1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP verified"
+                    },
+                    "422": {
+                        "description": "Invalid OTP or validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/forgot-password/resend-otp": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Resend a password reset OTP",
+                "operationId": "ad8a1e226023b0206596d596492107bb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP resent"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/forgot-password/reset": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Reset password after OTP verification",
+                "operationId": "05e7bb15da64b7e3b9ec89e99f296fe9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 6
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password reset successful"
+                    },
+                    "422": {
+                        "description": "Validation error or unverified OTP"
+                    }
+                }
+            }
+        },
         "/api/v1/auth/login": {
             "post": {
                 "tags": [

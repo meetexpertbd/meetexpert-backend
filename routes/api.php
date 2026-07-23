@@ -17,10 +17,13 @@ Route::prefix('v1')->group(function (): void {
         Route::post('register/verify-otp', [AuthController::class, 'verifyOtp']);
         Route::post('register/complete', [AuthController::class, 'completeRegistration']);
         Route::post('register/resend-otp', [AuthController::class, 'resendOtp']);
+        Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::post('forgot-password/verify-otp', [AuthController::class, 'verifyPasswordResetOtp']);
+        Route::post('forgot-password/resend-otp', [AuthController::class, 'resendPasswordResetOtp']);
+        Route::post('forgot-password/reset', [AuthController::class, 'resetPassword']);
         Route::post('login', [AuthController::class, 'login']);
         Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
     });
-
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::get('profile', [AuthController::class, 'profile']);
         Route::post('expert/application', [ExpertApplicationController::class, 'store']);

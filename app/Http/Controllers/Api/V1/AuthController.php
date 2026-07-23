@@ -4,14 +4,19 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\CompleteRegistrationRequest;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterEmailRequest;
 use App\Http\Requests\Auth\ResendOtpRequest;
+use App\Http\Requests\Auth\ResendPasswordResetOtpRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Http\Requests\Auth\VerifyOtpRequest;
+use App\Http\Requests\Auth\VerifyPasswordResetOtpRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Responses\ApiResponse;
 use App\Models\User;
 use App\Services\AuthService;
+use App\Services\PasswordResetOtpService;
 use App\Services\RegistrationOtpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,6 +27,7 @@ class AuthController extends Controller
 {
     public function __construct(
         private RegistrationOtpService $registrationOtpService,
+        private PasswordResetOtpService $passwordResetOtpService,
         private AuthService $authService
     ) {}
 
@@ -154,6 +160,119 @@ class AuthController extends Controller
         }
 
         return ApiResponse::success('A new OTP has been sent to your email.', null);
+    }
+
+    #[OA\Post(
+        path: '/api/v1/auth/forgot-password',
+        tags: ['Authentication'],
+        summary: 'Send a password reset OTP',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'OTP sent'),
+            new OA\Response(response: 422, description: 'Validation error or account not found'),
+        ]
+    )]
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        $this->passwordResetOtpService->requestOtp($request->validated('email'));
+
+        return ApiResponse::success('OTP sent to your email.', null);
+    }
+
+    #[OA\Post(
+        path: '/api/v1/auth/forgot-password/verify-otp',
+        tags: ['Authentication'],
+        summary: 'Verify a password reset OTP',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'otp'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                    new OA\Property(property: 'otp', type: 'string', pattern: '^[0-9]{4}$', example: '1234'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'OTP verified'),
+            new OA\Response(response: 422, description: 'Invalid OTP or validation error'),
+        ]
+    )]
+    public function verifyPasswordResetOtp(VerifyPasswordResetOtpRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+        $this->passwordResetOtpService->verifyOtp($validated['email'], $validated['otp']);
+
+        return ApiResponse::success('OTP verified. You can reset your password.', null);
+    }
+
+    #[OA\Post(
+        path: '/api/v1/auth/forgot-password/resend-otp',
+        tags: ['Authentication'],
+        summary: 'Resend a password reset OTP',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'OTP resent'),
+            new OA\Response(response: 429, description: 'Too many requests'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+    public function resendPasswordResetOtp(ResendPasswordResetOtpRequest $request): JsonResponse
+    {
+        try {
+            $this->passwordResetOtpService->resendOtp($request->validated('email'));
+        } catch (TooManyRequestsHttpException $e) {
+            return ApiResponse::error($e->getMessage(), null, 429);
+        }
+
+        return ApiResponse::success('A new OTP has been sent to your email.', null);
+    }
+
+    #[OA\Post(
+        path: '/api/v1/auth/forgot-password/reset',
+        tags: ['Authentication'],
+        summary: 'Reset password after OTP verification',
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'password', 'password_confirmation'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
+                    new OA\Property(property: 'password', type: 'string', format: 'password', minLength: 6),
+                    new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Password reset successful'),
+            new OA\Response(response: 422, description: 'Validation error or unverified OTP'),
+        ]
+    )]
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+        $this->passwordResetOtpService->resetPassword(
+            $validated['email'],
+            $validated['password']
+        );
+
+        return ApiResponse::success('Password reset successfully. Please login with your new password.', null);
     }
 
     #[OA\Post(

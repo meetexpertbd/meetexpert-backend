@@ -13,13 +13,14 @@ class OtpMail extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        public string $otpCode
+        public string $otpCode,
+        public string $mailSubject = 'Your registration verification code',
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your registration verification code',
+            subject: $this->mailSubject,
         );
     }
 
