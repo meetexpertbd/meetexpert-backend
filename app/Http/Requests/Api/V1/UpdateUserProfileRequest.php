@@ -33,9 +33,9 @@ class UpdateUserProfileRequest extends FormRequest
             'avatar' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'present_address' => ['sometimes', 'nullable', 'string', 'max:2000'],
             'permanent_address' => ['sometimes', 'nullable', 'string', 'max:2000'],
-            'district' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'country' => ['sometimes', 'nullable', 'string', 'size:2'],
-            'preferred_language' => ['sometimes', 'nullable', 'string', Rule::in(['en', 'bn'])],
+            'district' => ['sometimes', 'nullable'],
+            'country' => ['sometimes', 'nullable'],
+            'preferred_language' => ['sometimes', 'nullable'],
         ];
     }
 }

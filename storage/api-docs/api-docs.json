@@ -533,14 +533,12 @@
                                     "country": {
                                         "type": "string",
                                         "example": "BD",
-                                        "nullable": true,
                                         "maxLength": 2,
                                         "minLength": 2
                                     },
                                     "preferred_language": {
                                         "type": "string",
                                         "example": "bn",
-                                        "nullable": true,
                                         "enum": [
                                             "en",
                                             "bn"
@@ -588,14 +586,12 @@
                                     "country": {
                                         "type": "string",
                                         "example": "BD",
-                                        "nullable": true,
                                         "maxLength": 2,
                                         "minLength": 2
                                     },
                                     "preferred_language": {
                                         "type": "string",
                                         "example": "bn",
-                                        "nullable": true,
                                         "enum": [
                                             "en",
                                             "bn"

@@ -54,10 +54,8 @@ class UserProfileService
                 );
             }
 
-            if (! $profile->exists) {
-                $profile->country = $profile->country ?: 'BD';
-                $profile->preferred_language = $profile->preferred_language ?: 'bn';
-            }
+            $profile->country = $profile->country ?: 'BD';
+            $profile->preferred_language = $profile->preferred_language ?: 'bn';
 
             $profile->save();
 

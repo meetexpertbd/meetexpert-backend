@@ -394,8 +394,8 @@ class AuthController extends Controller
                             new OA\Property(property: 'present_address', type: 'string', nullable: true),
                             new OA\Property(property: 'permanent_address', type: 'string', nullable: true),
                             new OA\Property(property: 'district', type: 'string', nullable: true),
-                            new OA\Property(property: 'country', type: 'string', minLength: 2, maxLength: 2, example: 'BD', nullable: true),
-                            new OA\Property(property: 'preferred_language', type: 'string', enum: ['en', 'bn'], example: 'bn', nullable: true),
+                            new OA\Property(property: 'country', type: 'string', minLength: 2, maxLength: 2, example: 'BD'),
+                            new OA\Property(property: 'preferred_language', type: 'string', enum: ['en', 'bn'], example: 'bn'),
                         ]
                     )
                 ),
@@ -409,8 +409,8 @@ class AuthController extends Controller
                             new OA\Property(property: 'present_address', type: 'string', nullable: true),
                             new OA\Property(property: 'permanent_address', type: 'string', nullable: true),
                             new OA\Property(property: 'district', type: 'string', nullable: true),
-                            new OA\Property(property: 'country', type: 'string', minLength: 2, maxLength: 2, example: 'BD', nullable: true),
-                            new OA\Property(property: 'preferred_language', type: 'string', enum: ['en', 'bn'], example: 'bn', nullable: true),
+                            new OA\Property(property: 'country', type: 'string', minLength: 2, maxLength: 2, example: 'BD'),
+                            new OA\Property(property: 'preferred_language', type: 'string', enum: ['en', 'bn'], example: 'bn'),
                         ]
                     )
                 ),
