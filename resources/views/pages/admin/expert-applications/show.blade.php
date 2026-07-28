@@ -91,6 +91,33 @@
             </x-common.component-card>
         </div>
 
+        <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <x-common.component-card title="Years of experience">
+                <p class="text-sm text-gray-800 dark:text-white/90">{{ $application->years_of_experience ?? '—' }}</p>
+            </x-common.component-card>
+            <x-common.component-card title="Registration value">
+                <p class="text-sm text-gray-800 dark:text-white/90">{{ $application->registration_value ?? '—' }}</p>
+            </x-common.component-card>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <x-common.component-card title="Languages">
+                @if (empty($application->languages))
+                    <p class="text-sm text-gray-500 dark:text-gray-400">—</p>
+                @else
+                    <p class="text-sm text-gray-800 dark:text-white/90">{{ implode(', ', $application->languages) }}</p>
+                @endif
+            </x-common.component-card>
+            <x-common.component-card title="Intro video">
+                @if ($application->intro_video)
+                    <a href="{{ $application->intro_video }}" target="_blank" rel="noopener"
+                        class="text-sm text-brand-500 hover:underline break-all">{{ $application->intro_video }}</a>
+                @else
+                    <p class="text-sm text-gray-500 dark:text-gray-400">—</p>
+                @endif
+            </x-common.component-card>
+        </div>
+
         <div class="mt-6">
             <x-common.component-card title="Education">
                 @if ($application->education === null || $application->education === [])

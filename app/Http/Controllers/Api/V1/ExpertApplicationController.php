@@ -24,12 +24,22 @@ class ExpertApplicationController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['category_id', 'subcategory_id', 'professional_headline', 'bio', 'skill_ids'],
+                required: ['category_id', 'subcategory_id', 'professional_headline', 'bio', 'years_of_experience', 'registration_value', 'languages', 'skill_ids'],
                 properties: [
                     new OA\Property(property: 'category_id', type: 'integer'),
                     new OA\Property(property: 'subcategory_id', type: 'integer'),
                     new OA\Property(property: 'professional_headline', type: 'string', maxLength: 255),
                     new OA\Property(property: 'bio', type: 'string', maxLength: 10000),
+                    new OA\Property(property: 'years_of_experience', type: 'integer', minimum: 0, maximum: 80),
+                    new OA\Property(property: 'registration_value', type: 'string', maxLength: 255),
+                    new OA\Property(property: 'intro_video', type: 'string', format: 'uri', maxLength: 2048, nullable: true),
+                    new OA\Property(
+                        property: 'languages',
+                        type: 'array',
+                        minItems: 1,
+                        maxItems: 20,
+                        items: new OA\Items(type: 'string', maxLength: 50)
+                    ),
                     new OA\Property(
                         property: 'education',
                         type: 'array',

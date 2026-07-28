@@ -641,6 +641,9 @@
                                     "subcategory_id",
                                     "professional_headline",
                                     "bio",
+                                    "years_of_experience",
+                                    "registration_value",
+                                    "languages",
                                     "skill_ids"
                                 ],
                                 "properties": {
@@ -657,6 +660,30 @@
                                     "bio": {
                                         "type": "string",
                                         "maxLength": 10000
+                                    },
+                                    "years_of_experience": {
+                                        "type": "integer",
+                                        "maximum": 80,
+                                        "minimum": 0
+                                    },
+                                    "registration_value": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "intro_video": {
+                                        "type": "string",
+                                        "format": "uri",
+                                        "nullable": true,
+                                        "maxLength": 2048
+                                    },
+                                    "languages": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "maxLength": 50
+                                        },
+                                        "maxItems": 20,
+                                        "minItems": 1
                                     },
                                     "education": {
                                         "type": "array",
@@ -1202,6 +1229,20 @@
                     }
                 }
             }
+        },
+        "/api/v1/taxonomy": {
+            "get": {
+                "tags": [
+                    "Taxonomy"
+                ],
+                "summary": "Get categories with nested subcategories and skills",
+                "operationId": "21316004ac480e36b6b30056230e068d",
+                "responses": {
+                    "200": {
+                        "description": "Taxonomy retrieved"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -1238,6 +1279,10 @@
         {
             "name": "Experts",
             "description": "Experts"
+        },
+        {
+            "name": "Taxonomy",
+            "description": "Taxonomy"
         }
     ]
 }

@@ -5,9 +5,11 @@ use App\Http\Controllers\Api\V1\ExpertApplicationController;
 use App\Http\Controllers\Api\V1\ExpertAvailabilityController;
 use App\Http\Controllers\Api\V1\ExpertBookingController;
 use App\Http\Controllers\Api\V1\ExpertController;
+use App\Http\Controllers\Api\V1\TaxonomyController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
+    Route::get('taxonomy', [TaxonomyController::class, 'index']);
     Route::get('experts', [ExpertController::class, 'index']);
     Route::get('experts/{user}/available-slots', [ExpertController::class, 'availableSlots']);
     Route::get('experts/{user}', [ExpertController::class, 'show']);

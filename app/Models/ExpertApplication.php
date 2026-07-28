@@ -16,6 +16,10 @@ class ExpertApplication extends Model
         'status',
         'professional_headline',
         'bio',
+        'years_of_experience',
+        'registration_value',
+        'intro_video',
+        'languages',
         'education',
         'experience',
         'portfolio',
@@ -28,6 +32,8 @@ class ExpertApplication extends Model
     {
         return [
             'status' => ExpertApplicationStatus::class,
+            'years_of_experience' => 'integer',
+            'languages' => 'array',
             'education' => 'array',
             'experience' => 'array',
             'portfolio' => 'array',
