@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\V1\ExpertApplicationsWebController;
 use App\Http\Controllers\Admin\V1\ExpertsWebController;
 use App\Http\Controllers\Admin\V1\SkillController;
 use App\Http\Controllers\Admin\V1\SubcategoryController;
+use App\Http\Controllers\Admin\V1\TaxonomyBulkUploadController;
 use App\Http\Controllers\Admin\V1\UsersWebController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
@@ -53,6 +54,11 @@ Route::middleware('auth')->group(function () {
         'update' => 'taxonomy.skills.update',
         'destroy' => 'taxonomy.skills.destroy',
     ]);
+
+    Route::get('taxonomy/bulk-upload', [TaxonomyBulkUploadController::class, 'create'])
+        ->name('taxonomy.bulk-upload.create');
+    Route::post('taxonomy/bulk-upload', [TaxonomyBulkUploadController::class, 'store'])
+        ->name('taxonomy.bulk-upload.store');
 
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('expert-applications', [ExpertApplicationsWebController::class, 'index'])

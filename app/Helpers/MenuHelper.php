@@ -21,6 +21,7 @@ class MenuHelper
                     ['name' => 'Category', 'path' => '/taxonomy/categories', 'pro' => false],
                     ['name' => 'Subcategory', 'path' => '/taxonomy/subcategories', 'pro' => false],
                     ['name' => 'Skills', 'path' => '/taxonomy/skills', 'pro' => false],
+                    ['name' => 'Bulk upload', 'path' => '/taxonomy/bulk-upload', 'pro' => false],
                 ],
             ],
             [
