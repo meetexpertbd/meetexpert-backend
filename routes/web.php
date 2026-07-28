@@ -80,6 +80,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('users', [UsersWebController::class, 'index'])
             ->name('admin.users.index');
+        Route::post('users', [UsersWebController::class, 'store'])
+            ->name('admin.users.store');
+        Route::get('users/{user}/apply-for-expert', [UsersWebController::class, 'applyForExpert'])
+            ->name('admin.users.apply-for-expert');
+        Route::post('users/{user}/apply-for-expert', [UsersWebController::class, 'storeExpertApplication'])
+            ->name('admin.users.apply-for-expert.store');
         Route::get('all-users', [UsersWebController::class, 'allTypes'])
             ->name('admin.all-users.index');
         Route::post('all-users/{user}/make-admin', [UsersWebController::class, 'makeAdmin'])

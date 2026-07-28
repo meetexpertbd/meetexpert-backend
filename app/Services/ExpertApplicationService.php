@@ -163,6 +163,26 @@ class ExpertApplicationService
     }
 
     /**
+     * @param  list<array{name: string, file: UploadedFile}>  $documents
+     *
+     * @throws ValidationException
+     */
+    public function submitApprovedByAdmin(
+        User $admin,
+        User $user,
+        array $data,
+        ?UploadedFile $avatar = null,
+        array $documents = [],
+        ?UploadedFile $introVideo = null
+    ): ExpertApplication {
+        return DB::transaction(function () use ($admin, $user, $data, $avatar, $documents, $introVideo) {
+            $application = $this->submit($user, $data, $avatar, $documents, $introVideo);
+
+            return $this->approveByAdmin($admin, $application, 'Expert profile created by administrator.');
+        });
+    }
+
+    /**
      * @throws ValidationException
      */
     public function approveByAdmin(User $admin, ExpertApplication $application, string $note): ExpertApplication
