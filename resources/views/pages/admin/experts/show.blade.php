@@ -84,6 +84,20 @@
                             <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Bio</dt>
                             <dd class="mt-1 text-sm text-gray-800 dark:text-white/90 whitespace-pre-wrap">{{ $application->bio }}</dd>
                         </div>
+                        <div>
+                            <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Years of experience</dt>
+                            <dd class="mt-1 text-sm text-gray-800 dark:text-white/90">{{ $application->years_of_experience ?? '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Registration value</dt>
+                            <dd class="mt-1 text-sm text-gray-800 dark:text-white/90">{{ $application->registration_value ?? '—' }}</dd>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Languages</dt>
+                            <dd class="mt-1 text-sm text-gray-800 dark:text-white/90">
+                                {{ ! empty($application->languages) ? implode(', ', $application->languages) : '—' }}
+                            </dd>
+                        </div>
                         @if ($application->admin_feedback)
                             <div class="sm:col-span-2">
                                 <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Admin feedback</dt>
@@ -91,6 +105,123 @@
                             </div>
                         @endif
                     </dl>
+
+                    @php
+                        $avatarUrl = $application->avatarUrl();
+                        $introVideoUrl = $application->introVideoUrl();
+                        $documents = $application->documentsWithUrls();
+                        $isDirectIntroVideo = $introVideoUrl && preg_match('/\.(mp4|webm|mov|m4v|avi)(\?|$)/i', $introVideoUrl);
+                    @endphp
+
+                    <div class="mt-6 border-t border-gray-100 pt-6 dark:border-gray-800">
+                        <h3 class="mb-4 text-sm font-medium text-gray-900 dark:text-white/90">Media & documents</h3>
+                        <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                            <div>
+                                <h4 class="mb-3 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Avatar</h4>
+                                @if ($avatarUrl)
+                                    <div class="flex flex-col gap-3">
+                                        <a href="{{ $avatarUrl }}" target="_blank" rel="noopener" class="inline-block w-fit">
+                                            <img src="{{ $avatarUrl }}" alt="Expert avatar"
+                                                class="h-40 w-40 rounded-xl object-cover border border-gray-200 shadow-sm dark:border-gray-800">
+                                        </a>
+                                        <a href="{{ $avatarUrl }}" target="_blank" rel="noopener"
+                                            class="text-sm font-medium text-brand-500 hover:text-brand-600">Open image</a>
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">No avatar uploaded.</p>
+                                @endif
+                            </div>
+
+                            <div class="xl:col-span-2">
+                                <h4 class="mb-3 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Intro video</h4>
+                                @if ($introVideoUrl)
+                                    <div class="space-y-3">
+                                        @if ($isDirectIntroVideo)
+                                            <video controls preload="metadata"
+                                                class="h-48 w-auto max-w-md rounded-xl border border-gray-200 bg-black object-contain dark:border-gray-800"
+                                                src="{{ $introVideoUrl }}">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        @else
+                                            <div
+                                                class="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-white/[0.02]">
+                                                <p class="text-sm text-gray-600 dark:text-gray-300">External video link</p>
+                                                <a href="{{ $introVideoUrl }}" target="_blank" rel="noopener"
+                                                    class="mt-1 block break-all text-sm font-medium text-brand-500 hover:text-brand-600">
+                                                    {{ $introVideoUrl }}
+                                                </a>
+                                            </div>
+                                        @endif
+                                        <a href="{{ $introVideoUrl }}" target="_blank" rel="noopener"
+                                            class="inline-flex text-sm font-medium text-brand-500 hover:text-brand-600">
+                                            Open in new tab
+                                        </a>
+                                    </div>
+                                @else
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">No intro video provided.</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <h4 class="mb-4 text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Documents</h4>
+                            @if ($documents === [])
+                                <p class="text-sm text-gray-500 dark:text-gray-400">No documents uploaded.</p>
+                            @else
+                                <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                                    @foreach ($documents as $document)
+                                        @php
+                                            $path = (string) ($document['path'] ?? '');
+                                            $url = $document['url'] ?? null;
+                                            $name = $document['name'] ?: 'Document';
+                                            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                                            $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true);
+                                            $isPdf = $ext === 'pdf';
+                                        @endphp
+                                        <div
+                                            class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.02]">
+                                            <div class="bg-gray-50 p-3 dark:bg-white/[0.03]">
+                                                @if ($url && $isImage)
+                                                    <a href="{{ $url }}" target="_blank" rel="noopener" class="block">
+                                                        <img src="{{ $url }}" alt="{{ $name }}"
+                                                            class="mx-auto h-40 w-full rounded-lg object-contain">
+                                                    </a>
+                                                @elseif ($url && $isPdf)
+                                                    <iframe src="{{ $url }}" title="{{ $name }}"
+                                                        class="h-48 w-full rounded-lg border border-gray-200 dark:border-gray-700"></iframe>
+                                                @else
+                                                    <div
+                                                        class="flex h-40 items-center justify-center rounded-lg border border-dashed border-gray-200 dark:border-gray-700">
+                                                        <div class="text-center">
+                                                            <p class="text-2xl font-semibold uppercase text-gray-400">
+                                                                {{ $ext !== '' ? $ext : 'file' }}</p>
+                                                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Preview not available</p>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="space-y-2 p-4">
+                                                <p class="truncate text-sm font-medium text-gray-900 dark:text-white/90"
+                                                    title="{{ $name }}">{{ $name }}</p>
+                                                <p class="truncate text-xs text-gray-500 dark:text-gray-400" title="{{ $path }}">
+                                                    {{ $path !== '' ? $path : '—' }}</p>
+                                                @if ($url)
+                                                    <div class="flex flex-wrap gap-3 pt-1">
+                                                        <a href="{{ $url }}" target="_blank" rel="noopener"
+                                                            class="text-sm font-medium text-brand-500 hover:text-brand-600">View</a>
+                                                        <a href="{{ $url }}" download
+                                                            class="text-sm font-medium text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white">
+                                                            Download
+                                                        </a>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </div>
 
                     <div class="mt-6 border-t border-gray-100 pt-6 dark:border-gray-800">
                         <h3 class="mb-3 text-sm font-medium text-gray-900 dark:text-white/90">Education</h3>
