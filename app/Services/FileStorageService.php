@@ -66,6 +66,16 @@ class FileStorageService
             return null;
         }
 
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        $diskName = $this->resolveDisk($disk);
+
+        if ($diskName === 'public') {
+            return asset('storage/'.$path);
+        }
+
         return $this->disk($disk)->url($path);
     }
 

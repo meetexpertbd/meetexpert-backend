@@ -6,6 +6,7 @@ use App\Enums\ExpertApplicationStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Services\FileStorageService;
 
 class ExpertApplication extends Model
 {
@@ -20,6 +21,8 @@ class ExpertApplication extends Model
         'registration_value',
         'intro_video',
         'languages',
+        'avatar',
+        'documents',
         'education',
         'experience',
         'portfolio',
@@ -34,11 +37,48 @@ class ExpertApplication extends Model
             'status' => ExpertApplicationStatus::class,
             'years_of_experience' => 'integer',
             'languages' => 'array',
+            'documents' => 'array',
             'education' => 'array',
             'experience' => 'array',
             'portfolio' => 'array',
             'reviewed_at' => 'datetime',
         ];
+    }
+
+    public function avatarUrl(): ?string
+    {
+        return app(FileStorageService::class)->url($this->avatar);
+    }
+
+    public function introVideoUrl(): ?string
+    {
+        if ($this->intro_video === null || $this->intro_video === '') {
+            return null;
+        }
+
+        if (str_starts_with($this->intro_video, 'http://') || str_starts_with($this->intro_video, 'https://')) {
+            return $this->intro_video;
+        }
+
+        return app(FileStorageService::class)->url($this->intro_video);
+    }
+
+    /**
+     * @return list<array{name: string, path: string, url: string|null}>
+     */
+    public function documentsWithUrls(): array
+    {
+        $storage = app(FileStorageService::class);
+
+        return collect($this->documents ?? [])
+            ->filter(fn ($doc) => is_array($doc) && ! empty($doc['path']))
+            ->map(fn (array $doc) => [
+                'name' => (string) ($doc['name'] ?? ''),
+                'path' => (string) $doc['path'],
+                'url' => $storage->url($doc['path']),
+            ])
+            ->values()
+            ->all();
     }
 
     public function user(): BelongsTo

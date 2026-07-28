@@ -12,6 +12,19 @@ class StoreExpertApplicationRequest extends FormRequest
         return $this->user() !== null;
     }
 
+    protected function prepareForValidation(): void
+    {
+        foreach (['languages', 'education', 'experience', 'portfolio', 'skill_ids'] as $key) {
+            $value = $this->input($key);
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $this->merge([$key => $decoded]);
+                }
+            }
+        }
+    }
+
     public function rules(): array
     {
         return [
@@ -25,9 +38,15 @@ class StoreExpertApplicationRequest extends FormRequest
             'bio' => ['required', 'string', 'max:10000'],
             'years_of_experience' => ['required', 'integer', 'min:0', 'max:80'],
             'registration_value' => ['required', 'string', 'max:255'],
-            'intro_video' => ['nullable', 'string', 'url', 'max:2048'],
+            'intro_video' => $this->hasFile('intro_video')
+                ? ['nullable', 'file', 'mimetypes:video/mp4,video/quicktime,video/webm,video/x-msvideo', 'max:51200']
+                : ['nullable', 'string', 'url', 'max:2048'],
             'languages' => ['required', 'array', 'min:1', 'max:20'],
             'languages.*' => ['required', 'string', 'max:50'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'documents' => ['nullable', 'array', 'max:10'],
+            'documents.*.name' => ['required', 'string', 'max:255'],
+            'documents.*.file' => ['required', 'file', 'mimes:pdf,doc,docx,jpg,jpeg,png,webp', 'max:10240'],
             'education' => ['nullable', 'array', 'max:20'],
             'education.*.institution' => ['required_with:education', 'string', 'max:255'],
             'education.*.degree' => ['nullable', 'string', 'max:255'],

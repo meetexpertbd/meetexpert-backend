@@ -634,7 +634,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "required": [
                                     "category_id",
@@ -671,117 +671,71 @@
                                         "maxLength": 255
                                     },
                                     "intro_video": {
-                                        "type": "string",
-                                        "format": "uri",
+                                        "description": "Either a video file upload or an external video URL",
                                         "nullable": true,
-                                        "maxLength": 2048
+                                        "oneOf": [
+                                            {
+                                                "type": "string",
+                                                "format": "binary"
+                                            },
+                                            {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "maxLength": 2048
+                                            }
+                                        ]
                                     },
                                     "languages": {
+                                        "description": "JSON array string or repeated form fields",
+                                        "type": "string",
+                                        "example": "[\"en\",\"bn\"]"
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "nullable": true
+                                    },
+                                    "documents": {
                                         "type": "array",
                                         "items": {
-                                            "type": "string",
-                                            "maxLength": 50
+                                            "required": [
+                                                "name",
+                                                "file"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 255
+                                                },
+                                                "file": {
+                                                    "type": "string",
+                                                    "format": "binary"
+                                                }
+                                            },
+                                            "type": "object"
                                         },
-                                        "maxItems": 20,
-                                        "minItems": 1
+                                        "nullable": true,
+                                        "maxItems": 10
                                     },
                                     "education": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "institution"
-                                            ],
-                                            "properties": {
-                                                "institution": {
-                                                    "type": "string",
-                                                    "maxLength": 255
-                                                },
-                                                "degree": {
-                                                    "type": "string",
-                                                    "nullable": true,
-                                                    "maxLength": 255
-                                                },
-                                                "year": {
-                                                    "type": "integer",
-                                                    "nullable": true,
-                                                    "maximum": 2100,
-                                                    "minimum": 1900
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "nullable": true,
-                                        "maxItems": 20
+                                        "description": "JSON array string",
+                                        "type": "string",
+                                        "nullable": true
                                     },
                                     "experience": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "title"
-                                            ],
-                                            "properties": {
-                                                "title": {
-                                                    "type": "string",
-                                                    "maxLength": 255
-                                                },
-                                                "organization": {
-                                                    "type": "string",
-                                                    "nullable": true,
-                                                    "maxLength": 255
-                                                },
-                                                "start_year": {
-                                                    "type": "integer",
-                                                    "nullable": true,
-                                                    "maximum": 2100,
-                                                    "minimum": 1900
-                                                },
-                                                "end_year": {
-                                                    "type": "integer",
-                                                    "nullable": true,
-                                                    "maximum": 2100,
-                                                    "minimum": 1900
-                                                },
-                                                "description": {
-                                                    "type": "string",
-                                                    "nullable": true,
-                                                    "maxLength": 2000
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "nullable": true,
-                                        "maxItems": 30
+                                        "description": "JSON array string",
+                                        "type": "string",
+                                        "nullable": true
                                     },
                                     "portfolio": {
-                                        "type": "array",
-                                        "items": {
-                                            "required": [
-                                                "url"
-                                            ],
-                                            "properties": {
-                                                "title": {
-                                                    "type": "string",
-                                                    "nullable": true,
-                                                    "maxLength": 255
-                                                },
-                                                "url": {
-                                                    "type": "string",
-                                                    "format": "uri",
-                                                    "maxLength": 2048
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "nullable": true,
-                                        "maxItems": 20
+                                        "description": "JSON array string",
+                                        "type": "string",
+                                        "nullable": true
                                     },
                                     "skill_ids": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        },
-                                        "maxItems": 50,
-                                        "minItems": 1
+                                        "description": "JSON array string or repeated form fields",
+                                        "type": "string",
+                                        "example": "[1,2,3]"
                                     }
                                 },
                                 "type": "object"
