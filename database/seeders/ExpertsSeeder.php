@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\ExpertDetailStatus;
+use App\Enums\RegistrationFrom;
 use App\Models\Category;
 use App\Models\ExpertDetail;
 use App\Models\User;
@@ -53,6 +54,7 @@ class ExpertsSeeder extends Seeder
                     'name' => $name,
                     'password' => $password,
                     'user_type' => User::USER_TYPE_EXPERT,
+                    'registration_from' => RegistrationFrom::AdminPanel,
                     'email_verified_at' => now(),
                 ]
             );

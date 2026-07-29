@@ -4,12 +4,13 @@ namespace App\Services;
 
 use App\Models\RegistrationOtp;
 use App\Models\User;
+use App\Enums\RegistrationFrom;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
 {
-    public function completeRegistration(string $email, string $name, string $password): User
+    public function completeRegistration(string $email, string $name, string $password, RegistrationFrom $registrationFrom): User
     {
         $record = RegistrationOtp::where('email', $email)->first();
 
@@ -36,6 +37,7 @@ class AuthService
             'email' => $email,
             'password' => $password,
             'user_type' => User::USER_TYPE_USER,
+            'registration_from' => $registrationFrom,
             'email_verified_at' => $record->verified_at,
         ]);
 

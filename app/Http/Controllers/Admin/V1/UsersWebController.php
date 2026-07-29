@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V1;
 
 use App\Http\Controllers\Controller;
+use App\Enums\RegistrationFrom;
 use App\Models\Category;
 use App\Models\User;
 use App\Services\ExpertApplicationService;
@@ -46,6 +47,7 @@ class UsersWebController extends Controller
             'email' => $validated['email'],
             'password' => $validated['password'],
             'user_type' => User::USER_TYPE_USER,
+            'registration_from' => RegistrationFrom::AdminPanel,
             'email_verified_at' => now(),
         ]);
 

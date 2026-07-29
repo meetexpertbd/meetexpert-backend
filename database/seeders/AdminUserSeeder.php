@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\RegistrationFrom;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -15,6 +16,7 @@ class AdminUserSeeder extends Seeder
                 'name' => 'admin',
                 'password' => '12345678',
                 'user_type' => User::USER_TYPE_ADMIN,
+                'registration_from' => RegistrationFrom::AdminPanel,
                 'email_verified_at' => now(),
             ]
         );

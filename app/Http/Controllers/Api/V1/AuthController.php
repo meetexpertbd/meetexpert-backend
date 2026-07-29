@@ -15,6 +15,7 @@ use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Http\Requests\Auth\VerifyPasswordResetOtpRequest;
 use App\Http\Resources\UserResource;
 use App\Http\Responses\ApiResponse;
+use App\Enums\RegistrationFrom;
 use App\Models\User;
 use App\Services\AuthService;
 use App\Services\PasswordResetOtpService;
@@ -121,12 +122,18 @@ class AuthController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['email', 'name', 'password', 'password_confirmation'],
+                required: ['email', 'name', 'password', 'password_confirmation', 'registration_from'],
                 properties: [
                     new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255),
                     new OA\Property(property: 'name', type: 'string', maxLength: 255),
                     new OA\Property(property: 'password', type: 'string', format: 'password', minLength: 6),
                     new OA\Property(property: 'password_confirmation', type: 'string', format: 'password'),
+                    new OA\Property(
+                        property: 'registration_from',
+                        type: 'string',
+                        enum: ['web', 'app'],
+                        example: 'app'
+                    ),
                 ]
             )
         ),
@@ -141,7 +148,8 @@ class AuthController extends Controller
         $user = $this->authService->completeRegistration(
             $validated['email'],
             $validated['name'],
-            $validated['password']
+            $validated['password'],
+            RegistrationFrom::from($validated['registration_from'])
         );
 
         $token = $user->createToken('auth')->plainTextToken;

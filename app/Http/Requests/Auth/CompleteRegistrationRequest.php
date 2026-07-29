@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Enums\RegistrationFrom;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class CompleteRegistrationRequest extends FormRequest
@@ -18,6 +20,14 @@ class CompleteRegistrationRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'confirmed', Password::min(6)],
+            'registration_from' => [
+                'required',
+                'string',
+                Rule::in([
+                    RegistrationFrom::Web->value,
+                    RegistrationFrom::App->value,
+                ]),
+            ],
         ];
     }
 }

@@ -145,7 +145,8 @@
                                     "email",
                                     "name",
                                     "password",
-                                    "password_confirmation"
+                                    "password_confirmation",
+                                    "registration_from"
                                 ],
                                 "properties": {
                                     "email": {
@@ -165,6 +166,14 @@
                                     "password_confirmation": {
                                         "type": "string",
                                         "format": "password"
+                                    },
+                                    "registration_from": {
+                                        "type": "string",
+                                        "example": "app",
+                                        "enum": [
+                                            "web",
+                                            "app"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -1081,12 +1090,14 @@
                 "tags": [
                     "Experts"
                 ],
-                "summary": "List approved experts",
+                "summary": "List active experts",
+                "description": "Filter by category, subcategory, and/or skill. Multiple skill_ids match experts that have any of those skills.",
                 "operationId": "3f7eee89528e608a1629632cd3f11789",
                 "parameters": [
                     {
                         "name": "category_id",
                         "in": "query",
+                        "required": false,
                         "schema": {
                             "type": "integer"
                         }
@@ -1094,13 +1105,43 @@
                     {
                         "name": "subcategory_id",
                         "in": "query",
+                        "required": false,
                         "schema": {
                             "type": "integer"
                         }
                     },
                     {
+                        "name": "skill_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "skill_ids[]",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            }
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
                         "name": "per_page",
                         "in": "query",
+                        "required": false,
                         "schema": {
                             "type": "integer",
                             "maximum": 100,

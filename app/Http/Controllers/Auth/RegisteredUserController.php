@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Enums\RegistrationFrom;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -33,6 +34,7 @@ class RegisteredUserController extends Controller
             'email' => $validated['email'],
             'password' => $validated['password'],
             'user_type' => User::USER_TYPE_USER,
+            'registration_from' => RegistrationFrom::Web,
         ]);
 
         event(new Registered($user));
