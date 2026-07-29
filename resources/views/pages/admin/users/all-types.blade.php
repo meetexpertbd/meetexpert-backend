@@ -36,6 +36,7 @@
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Name</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Email</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Type</th>
+                            <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Registration from</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Email verified</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Joined</th>
                             <th class="px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Action</th>
@@ -47,6 +48,9 @@
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">{{ $user->name }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $user->email }}</td>
                                 <td class="px-5 py-4 text-sm capitalize text-gray-600 dark:text-gray-300">{{ $user->user_type }}</td>
+                                <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                    {{ $user->registration_from instanceof \BackedEnum ? str_replace('_', ' ', $user->registration_from->value) : ($user->registration_from ?? '—') }}
+                                </td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
                                     {{ $user->email_verified_at?->format('M j, Y') ?? '—' }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
@@ -80,7 +84,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td colspan="7" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                     No users found.
                                 </td>
                             </tr>

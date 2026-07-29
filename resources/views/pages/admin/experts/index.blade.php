@@ -36,6 +36,7 @@
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Name</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Email</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Expert code</th>
+                            <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Registration from</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Availability slots</th>
                             <th class="px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
@@ -46,6 +47,9 @@
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">{{ $expert->name }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $expert->email }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">{{ $expert->expertDetail?->expert_code ?? '—' }}</td>
+                                <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                    {{ $expert->registration_from instanceof \BackedEnum ? str_replace('_', ' ', $expert->registration_from->value) : ($expert->registration_from ?? '—') }}
+                                </td>
                                 <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">{{ $expert->expert_availability_slots_count }}</td>
                                 <td class="px-5 py-4 text-right text-sm">
                                     <a href="{{ route('admin.experts.show', $expert) }}"
@@ -66,7 +70,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td colspan="6" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                     No experts yet.
                                 </td>
                             </tr>
