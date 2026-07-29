@@ -23,11 +23,20 @@ class ExpertController extends Controller
     #[OA\Get(
         path: '/api/v1/experts',
         tags: ['Experts'],
-        summary: 'List approved experts',
+        summary: 'List active experts',
+        description: 'Filter by category, subcategory, and/or skill. Multiple skill_ids match experts that have any of those skills.',
         parameters: [
-            new OA\Parameter(name: 'category_id', in: 'query', schema: new OA\Schema(type: 'integer')),
-            new OA\Parameter(name: 'subcategory_id', in: 'query', schema: new OA\Schema(type: 'integer')),
-            new OA\Parameter(name: 'per_page', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100)),
+            new OA\Parameter(name: 'category_id', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'subcategory_id', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(name: 'skill_id', in: 'query', required: false, schema: new OA\Schema(type: 'integer')),
+            new OA\Parameter(
+                name: 'skill_ids[]',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'array', items: new OA\Items(type: 'integer'))
+            ),
+            new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', minimum: 1)),
+            new OA\Parameter(name: 'per_page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100)),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Experts retrieved'),
