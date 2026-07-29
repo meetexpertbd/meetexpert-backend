@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\ExpertApplicationStatus;
 use App\Models\ExpertApplication;
+use App\Models\ExpertDetail;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,8 @@ use Illuminate\Validation\ValidationException;
 class ExpertApplicationService
 {
     public function __construct(
-        private FileStorageService $fileStorage
+        private FileStorageService $fileStorage,
+        private ExpertDetailService $expertDetailService
     ) {}
 
     public function submit(
@@ -174,7 +176,7 @@ class ExpertApplicationService
         ?UploadedFile $avatar = null,
         array $documents = [],
         ?UploadedFile $introVideo = null
-    ): ExpertApplication {
+    ): ExpertDetail {
         return DB::transaction(function () use ($admin, $user, $data, $avatar, $documents, $introVideo) {
             $application = $this->submit($user, $data, $avatar, $documents, $introVideo);
 
@@ -185,7 +187,7 @@ class ExpertApplicationService
     /**
      * @throws ValidationException
      */
-    public function approveByAdmin(User $admin, ExpertApplication $application, string $note): ExpertApplication
+    public function approveByAdmin(User $admin, ExpertApplication $application, string $note): ExpertDetail
     {
         return DB::transaction(function () use ($admin, $application, $note) {
             $application = ExpertApplication::query()->whereKey($application->id)->lockForUpdate()->firstOrFail();
@@ -198,16 +200,16 @@ class ExpertApplicationService
                 ]);
             }
 
-            $application->update([
-                'status' => ExpertApplicationStatus::Approved,
-                'admin_feedback' => $note,
-                'reviewed_at' => now(),
-                'reviewed_by_user_id' => $admin->id,
-            ]);
+            $application->load(['user', 'category', 'skills']);
+
+            $detail = $this->expertDetailService->createFromApprovedApplication($application);
 
             $user->update(['user_type' => User::USER_TYPE_EXPERT]);
 
-            return $application->fresh(['user', 'category', 'subcategory', 'skills', 'reviewedBy']);
+            $application->skills()->detach();
+            $application->delete();
+
+            return $detail->fresh(['user', 'category', 'subcategory', 'skills']);
         });
     }
 

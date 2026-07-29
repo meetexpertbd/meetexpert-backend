@@ -18,13 +18,44 @@
 @endphp
 
 @section('content')
-    <div>
+    <div x-data="{
+        async confirmDelete(e, name) {
+            const form = e.target.closest('form');
+            if (!form || !window.Swal) return;
+            const { isConfirmed } = await window.Swal.fire({
+                title: 'Delete application?',
+                text: name
+                    ? 'Application for “' + name + '” will be removed permanently.'
+                    : 'This application will be removed permanently.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                focusCancel: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+            });
+            if (isConfirmed) form.submit();
+        }
+    }">
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
             <x-common.page-breadcrumb pageTitle="Expert application #{{ $application->id }}" />
-            <a href="{{ route('admin.expert-applications.index') }}"
-                class="text-sm font-medium text-brand-500 hover:text-brand-600">
-                ← Back to list
-            </a>
+            <div class="flex flex-wrap items-center gap-4">
+                <form action="{{ route('admin.expert-applications.destroy', $application) }}" method="post">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button"
+                        class="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400"
+                        @click="confirmDelete($event, @js($application->user->name ?? 'applicant'))">
+                        Delete application
+                    </button>
+                </form>
+                <a href="{{ route('admin.expert-applications.index') }}"
+                    class="text-sm font-medium text-brand-500 hover:text-brand-600">
+                    ← Back to list
+                </a>
+            </div>
         </div>
 
         <x-common.component-card title="Overview">

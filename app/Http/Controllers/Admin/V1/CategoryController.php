@@ -29,6 +29,7 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
         $data['slug'] = $this->slugFromName($data['name'], null);
+        $data['code_prefix'] = $this->normalizeCodePrefix($data['code_prefix']);
         $data['sort_order'] = $data['sort_order'] ?? 0;
         $data['is_active'] = $request->boolean('is_active');
 
@@ -43,6 +44,7 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
         $data['slug'] = $this->slugFromName($data['name'], $category);
+        $data['code_prefix'] = $this->normalizeCodePrefix($data['code_prefix']);
         $data['sort_order'] = $data['sort_order'] ?? 0;
         $data['is_active'] = $request->boolean('is_active');
 
@@ -60,6 +62,11 @@ class CategoryController extends Controller
         return redirect()
             ->route('taxonomy.categories.index')
             ->with('danger', 'Category deleted.');
+    }
+
+    private function normalizeCodePrefix(string $prefix): string
+    {
+        return preg_replace('/[^A-Za-z0-9]/', '', $prefix) ?? '';
     }
 
     private function slugFromName(string $name, ?Category $except): string

@@ -16,6 +16,7 @@
         openEdit(btn) {
             this.editAction = btn.dataset.updateUrl;
             this.$refs.editName.value = btn.dataset.name;
+            this.$refs.editCodePrefix.value = btn.dataset.codePrefix ?? "";
             this.$refs.editDescription.value = btn.dataset.description ?? "";
             this.$refs.editSortOrder.value = btn.dataset.sortOrder ?? "0";
             this.$refs.editActive.checked = btn.dataset.active === "1";
@@ -61,6 +62,9 @@
                                 Name
                             </th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                                Code prefix
+                            </th>
+                            <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
                                 Slug
                             </th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
@@ -79,6 +83,9 @@
                             <tr>
                                 <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                                     {{ $category->name }}
+                                </td>
+                                <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">
+                                    {{ $category->code_prefix ?? '—' }}
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-400">
                                     {{ $category->slug }}
@@ -101,6 +108,7 @@
                                         data-update-url="{{ route('taxonomy.categories.update', $category) }}"
                                         data-category-id="{{ $category->id }}"
                                         data-name="{{ e($category->name) }}"
+                                        data-code-prefix="{{ e($category->code_prefix ?? '') }}"
                                         data-description="{{ e(str_replace(["\r\n", "\r", "\n"], ' ', $category->description ?? '')) }}"
                                         data-sort-order="{{ $category->sort_order }}"
                                         data-active="{{ $category->is_active ? '1' : '0' }}"
@@ -121,7 +129,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td colspan="6" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                     No categories yet.
                                     <button type="button" @click="createOpen = true" class="text-brand-500 hover:underline">
                                         Create one
@@ -174,6 +182,18 @@
                         <input id="create_name" name="name" type="text" value="{{ old('_form') === 'create' ? old('name') : '' }}"
                             required class="{{ $input }} @error('name') border-red-500 @enderror" />
                         @error('name')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="create_code_prefix" class="{{ $label }}">Code prefix <span class="text-red-500">*</span></label>
+                        <input id="create_code_prefix" name="code_prefix" type="text" maxlength="20"
+                            value="{{ old('_form') === 'create' ? old('code_prefix') : '' }}"
+                            placeholder="e.g. Dr" required
+                            class="{{ $input }} @error('code_prefix') border-red-500 @enderror" />
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used for expert codes like Dr-3528.</p>
+                        @error('code_prefix')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>
@@ -257,6 +277,18 @@
                             value="{{ $editHasErrors ? old('name') : '' }}" required
                             class="{{ $input }} @error('name') border-red-500 @enderror" />
                         @error('name')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="edit_code_prefix" class="{{ $label }}">Code prefix <span class="text-red-500">*</span></label>
+                        <input id="edit_code_prefix" name="code_prefix" type="text" maxlength="20" x-ref="editCodePrefix"
+                            value="{{ $editHasErrors ? old('code_prefix') : '' }}" required
+                            placeholder="e.g. Dr"
+                            class="{{ $input }} @error('code_prefix') border-red-500 @enderror" />
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used for expert codes like Dr-3528.</p>
+                        @error('code_prefix')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                     </div>

@@ -10,6 +10,7 @@ class Category extends Model
     protected $fillable = [
         'name',
         'slug',
+        'code_prefix',
         'description',
         'sort_order',
         'is_active',
@@ -25,5 +26,10 @@ class Category extends Model
     public function subcategories(): HasMany
     {
         return $this->hasMany(Subcategory::class);
+    }
+
+    public function expertDetails(): HasMany
+    {
+        return $this->hasMany(ExpertDetail::class);
     }
 }

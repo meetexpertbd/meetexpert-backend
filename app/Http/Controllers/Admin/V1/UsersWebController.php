@@ -23,6 +23,7 @@ class UsersWebController extends Controller
     {
         $users = User::query()
             ->where('user_type', User::USER_TYPE_USER)
+            ->withExists('expertApplications')
             ->orderBy('name')
             ->paginate(25);
 
@@ -59,6 +60,12 @@ class UsersWebController extends Controller
             return redirect()
                 ->route('admin.users.index')
                 ->with('danger', 'Only standard users can be converted to experts.');
+        }
+
+        if ($user->expertApplications()->exists()) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('info', $user->name.' already has an expert application.');
         }
 
         $categoriesPayload = Category::query()
@@ -98,6 +105,12 @@ class UsersWebController extends Controller
             return redirect()
                 ->route('admin.users.index')
                 ->with('danger', 'Only standard users can be converted to experts.');
+        }
+
+        if ($user->expertApplications()->exists()) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('info', $user->name.' already has an expert application.');
         }
 
         if (is_string($request->input('languages'))) {
@@ -239,5 +252,43 @@ class UsersWebController extends Controller
         return redirect()
             ->route('admin.all-users.index')
             ->with('success', $user->name.' is now an admin.');
+    }
+
+    public function destroy(Request $request, User $user): RedirectResponse
+    {
+        if ($user->user_type !== User::USER_TYPE_USER) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('danger', 'Only standard users can be deleted from this list.');
+        }
+
+        if ($request->user()->is($user)) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('danger', 'You cannot delete your own account.');
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('danger', $name.' deleted.');
+    }
+
+    public function destroyAny(Request $request, User $user): RedirectResponse
+    {
+        if ($request->user()->is($user)) {
+            return redirect()
+                ->route('admin.all-users.index')
+                ->with('danger', 'You cannot delete your own account.');
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        return redirect()
+            ->route('admin.all-users.index')
+            ->with('danger', $name.' deleted.');
     }
 }

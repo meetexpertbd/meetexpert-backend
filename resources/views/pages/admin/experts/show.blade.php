@@ -1,25 +1,50 @@
 @extends('layouts.app')
 
 @php
-    use App\Enums\ExpertApplicationStatus;
+    use App\Enums\ExpertDetailStatus;
 
     $dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-    $statusBadge = fn (ExpertApplicationStatus $s) => match ($s) {
-        ExpertApplicationStatus::Pending => 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
-        ExpertApplicationStatus::NeedsCorrection => 'bg-amber-100 text-amber-900 dark:bg-amber-900/30 dark:text-amber-200',
-        ExpertApplicationStatus::Approved => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
-        ExpertApplicationStatus::Rejected => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200',
-    };
+    $detail = $expert->expertDetail;
 @endphp
 
 @section('content')
-    <div>
+    <div x-data="{
+        async confirmDelete(e, name) {
+            const form = e.target.closest('form');
+            if (!form || !window.Swal) return;
+            const { isConfirmed } = await window.Swal.fire({
+                title: 'Delete expert?',
+                text: name
+                    ? '“' + name + '” will be removed permanently.'
+                    : 'This expert will be removed permanently.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                focusCancel: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+            });
+            if (isConfirmed) form.submit();
+        }
+    }">
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
             <x-common.page-breadcrumb pageTitle="Expert: {{ $expert->name }}" />
-            <a href="{{ route('admin.experts.index') }}" class="text-sm font-medium text-brand-500 hover:text-brand-600">
-                ← Back to experts
-            </a>
+            <div class="flex flex-wrap items-center gap-4">
+                <form action="{{ route('admin.experts.destroy', $expert) }}" method="post">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button"
+                        class="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400"
+                        @click="confirmDelete($event, @js($expert->name))">
+                        Delete expert
+                    </button>
+                </form>
+                <a href="{{ route('admin.experts.index') }}" class="text-sm font-medium text-brand-500 hover:text-brand-600">
+                    ← Back to experts
+                </a>
+            </div>
         </div>
 
         <x-common.component-card title="User">
@@ -41,26 +66,44 @@
                     <dd class="mt-1 text-sm text-gray-800 dark:text-white/90">
                         {{ $expert->email_verified_at?->format('M j, Y g:i A') ?? '—' }}</dd>
                 </div>
+                @if ($detail)
+                    <div>
+                        <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Expert code</dt>
+                        <dd class="mt-1 text-sm font-medium text-gray-800 dark:text-white/90">{{ $detail->expert_code }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Slug</dt>
+                        <dd class="mt-1 text-sm text-gray-800 dark:text-white/90 break-all">{{ $detail->slug }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">UUID</dt>
+                        <dd class="mt-1 text-sm text-gray-800 dark:text-white/90 break-all">{{ $detail->uuid }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Expert status</dt>
+                        <dd class="mt-1 text-sm capitalize text-gray-800 dark:text-white/90">
+                            {{ $detail->status instanceof \BackedEnum ? $detail->status->value : $detail->status }}
+                        </dd>
+                    </div>
+                @endif
             </dl>
         </x-common.component-card>
 
-        @foreach ($expert->expertApplications as $application)
+        @if ($detail)
+            @php $application = $detail; @endphp
             <div class="mt-6">
-                <x-common.component-card
-                    :title="$expert->expertApplications->count() > 1 ? 'Expert application ('.$loop->iteration.' of '.$expert->expertApplications->count().')' : 'Expert application'">
+                <x-common.component-card title="Expert profile">
                     <dl class="grid gap-4 sm:grid-cols-2">
                         <div>
                             <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Status</dt>
-                            <dd class="mt-1">
-                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {{ $statusBadge($application->status) }}">
-                                    {{ str_replace('_', ' ', $application->status->value) }}
-                                </span>
+                            <dd class="mt-1 text-sm capitalize text-gray-800 dark:text-white/90">
+                                {{ $detail->status instanceof ExpertDetailStatus ? $detail->status->value : $detail->status }}
                             </dd>
                         </div>
                         <div>
-                            <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Reviewed at</dt>
+                            <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Created</dt>
                             <dd class="mt-1 text-sm text-gray-800 dark:text-white/90">
-                                {{ $application->reviewed_at?->format('M j, Y g:i A') ?? '—' }}</dd>
+                                {{ $detail->created_at?->format('M j, Y g:i A') ?? '—' }}</dd>
                         </div>
                         <div>
                             <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Category</dt>
@@ -70,12 +113,6 @@
                             <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Subcategory</dt>
                             <dd class="mt-1 text-sm text-gray-800 dark:text-white/90">{{ $application->subcategory->name ?? '—' }}</dd>
                         </div>
-                        @if ($application->reviewedBy)
-                            <div class="sm:col-span-2">
-                                <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Reviewed by</dt>
-                                <dd class="mt-1 text-sm text-gray-800 dark:text-white/90">{{ $application->reviewedBy->name }}</dd>
-                            </div>
-                        @endif
                         <div class="sm:col-span-2">
                             <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Professional headline</dt>
                             <dd class="mt-1 text-sm text-gray-800 dark:text-white/90 whitespace-pre-wrap">{{ $application->professional_headline }}</dd>
@@ -98,12 +135,6 @@
                                 {{ ! empty($application->languages) ? implode(', ', $application->languages) : '—' }}
                             </dd>
                         </div>
-                        @if ($application->admin_feedback)
-                            <div class="sm:col-span-2">
-                                <dt class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Admin feedback</dt>
-                                <dd class="mt-1 text-sm text-gray-800 dark:text-white/90 whitespace-pre-wrap">{{ $application->admin_feedback }}</dd>
-                            </div>
-                        @endif
                     </dl>
 
                     @php
@@ -328,12 +359,10 @@
                     @endif
                 </x-common.component-card>
             </div>
-        @endforeach
-
-        @if ($expert->expertApplications->isEmpty())
+        @else
             <div class="mt-6">
-                <x-common.component-card title="Expert applications">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">No application rows for this user.</p>
+                <x-common.component-card title="Expert profile">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">No expert profile found for this user.</p>
                 </x-common.component-card>
             </div>
         @endif

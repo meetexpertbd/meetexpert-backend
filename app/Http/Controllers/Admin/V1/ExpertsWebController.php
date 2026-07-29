@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ExpertsWebController extends Controller
@@ -12,7 +14,8 @@ class ExpertsWebController extends Controller
     {
         $experts = User::query()
             ->where('user_type', User::USER_TYPE_EXPERT)
-            ->withCount(['expertApplications', 'expertAvailabilitySlots'])
+            ->with('expertDetail')
+            ->withCount(['expertAvailabilitySlots'])
             ->orderBy('name')
             ->paginate(20);
 
@@ -29,11 +32,9 @@ class ExpertsWebController extends Controller
         }
 
         $user->load([
-            'expertApplications' => fn ($q) => $q->orderByDesc('id'),
-            'expertApplications.category',
-            'expertApplications.subcategory',
-            'expertApplications.skills',
-            'expertApplications.reviewedBy',
+            'expertDetail.category',
+            'expertDetail.subcategory',
+            'expertDetail.skills',
             'expertAvailabilitySlots' => fn ($q) => $q->orderBy('day_of_week')->orderBy('start_time'),
         ]);
 
@@ -41,5 +42,25 @@ class ExpertsWebController extends Controller
             'title' => 'Expert: '.$user->name,
             'expert' => $user,
         ]);
+    }
+
+    public function destroy(Request $request, User $user): RedirectResponse
+    {
+        if ($user->user_type !== User::USER_TYPE_EXPERT) {
+            abort(404);
+        }
+
+        if ($request->user()->is($user)) {
+            return redirect()
+                ->route('admin.experts.index')
+                ->with('danger', 'You cannot delete your own account.');
+        }
+
+        $name = $user->name;
+        $user->delete();
+
+        return redirect()
+            ->route('admin.experts.index')
+            ->with('danger', $name.' deleted.');
     }
 }

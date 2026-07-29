@@ -5,7 +5,27 @@
 @endphp
 
 @section('content')
-    <div>
+    <div x-data="{
+        async confirmDelete(e, name) {
+            const form = e.target.closest('form');
+            if (!form || !window.Swal) return;
+            const { isConfirmed } = await window.Swal.fire({
+                title: 'Delete application?',
+                text: name
+                    ? 'Application for “' + name + '” will be removed permanently.'
+                    : 'This application will be removed permanently.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                focusCancel: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+            });
+            if (isConfirmed) form.submit();
+        }
+    }">
         <x-common.page-breadcrumb pageTitle="Expert applications" />
 
         <div class="mb-6">
@@ -83,11 +103,21 @@
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
                                     {{ $application->created_at?->format('M j, Y g:i A') }}
                                 </td>
-                                <td class="px-5 py-4 text-right">
+                                <td class="px-5 py-4 text-right text-sm">
                                     <a href="{{ route('admin.expert-applications.show', $application) }}"
-                                        class="text-sm font-medium text-brand-500 hover:text-brand-600">
+                                        class="font-medium text-brand-500 hover:text-brand-600">
                                         View
                                     </a>
+                                    <form action="{{ route('admin.expert-applications.destroy', $application) }}"
+                                        method="post" class="ml-3 inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button"
+                                            class="font-medium text-red-600 hover:text-red-700 dark:text-red-400"
+                                            @click="confirmDelete($event, @js($application->user->name ?? 'applicant'))">
+                                            Delete
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty

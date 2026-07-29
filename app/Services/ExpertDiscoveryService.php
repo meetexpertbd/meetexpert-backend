@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ExpertDetailStatus;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -13,7 +14,9 @@ class ExpertDiscoveryService
 
         return User::query()
             ->where('user_type', User::USER_TYPE_EXPERT)
-            ->whereHas('approvedExpertApplication', function ($query) use ($filters): void {
+            ->whereHas('expertDetail', function ($query) use ($filters): void {
+                $query->where('status', ExpertDetailStatus::Active);
+
                 if (! empty($filters['category_id'])) {
                     $query->where('category_id', (int) $filters['category_id']);
                 }
@@ -22,9 +25,9 @@ class ExpertDiscoveryService
                 }
             })
             ->with([
-                'approvedExpertApplication.category',
-                'approvedExpertApplication.subcategory',
-                'approvedExpertApplication.skills',
+                'expertDetail.category',
+                'expertDetail.subcategory',
+                'expertDetail.skills',
             ])
             ->orderBy('name')
             ->paginate($perPage);
@@ -37,11 +40,15 @@ class ExpertDiscoveryService
         }
 
         $user->load([
-            'approvedExpertApplication.category',
-            'approvedExpertApplication.subcategory',
-            'approvedExpertApplication.skills',
+            'expertDetail.category',
+            'expertDetail.subcategory',
+            'expertDetail.skills',
         ]);
 
-        return $user->approvedExpertApplication ? $user : null;
+        if (! $user->expertDetail || $user->expertDetail->status !== ExpertDetailStatus::Active) {
+            return null;
+        }
+
+        return $user;
     }
 }

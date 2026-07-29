@@ -1,7 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-    <div>
+    <div x-data="{
+        async confirmDelete(e, name) {
+            const form = e.target.closest('form');
+            if (!form || !window.Swal) return;
+            const { isConfirmed } = await window.Swal.fire({
+                title: 'Delete expert?',
+                text: name
+                    ? '“' + name + '” will be removed permanently.'
+                    : 'This expert will be removed permanently.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                focusCancel: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+            });
+            if (isConfirmed) form.submit();
+        }
+    }">
         <x-common.page-breadcrumb pageTitle="Experts" />
 
         <div class="mb-6">
@@ -15,7 +35,7 @@
                         <tr>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Name</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Email</th>
-                            <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Applications</th>
+                            <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Expert code</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Availability slots</th>
                             <th class="px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
@@ -25,13 +45,23 @@
                             <tr>
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">{{ $expert->name }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $expert->email }}</td>
-                                <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">{{ $expert->expert_applications_count }}</td>
+                                <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">{{ $expert->expertDetail?->expert_code ?? '—' }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">{{ $expert->expert_availability_slots_count }}</td>
-                                <td class="px-5 py-4 text-right">
+                                <td class="px-5 py-4 text-right text-sm">
                                     <a href="{{ route('admin.experts.show', $expert) }}"
-                                        class="text-sm font-medium text-brand-500 hover:text-brand-600">
+                                        class="font-medium text-brand-500 hover:text-brand-600">
                                         View
                                     </a>
+                                    <form action="{{ route('admin.experts.destroy', $expert) }}" method="post"
+                                        class="ml-3 inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button"
+                                            class="font-medium text-red-600 hover:text-red-700 dark:text-red-400"
+                                            @click="confirmDelete($event, @js($expert->name))">
+                                            Delete
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty

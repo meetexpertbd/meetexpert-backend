@@ -69,11 +69,15 @@ Route::middleware('auth')->group(function () {
             ->name('admin.expert-applications.approve');
         Route::post('expert-applications/{expert_application}/reject', [ExpertApplicationsWebController::class, 'reject'])
             ->name('admin.expert-applications.reject');
+        Route::delete('expert-applications/{expert_application}', [ExpertApplicationsWebController::class, 'destroy'])
+            ->name('admin.expert-applications.destroy');
 
         Route::get('experts', [ExpertsWebController::class, 'index'])
             ->name('admin.experts.index');
         Route::get('experts/{user}', [ExpertsWebController::class, 'show'])
             ->name('admin.experts.show');
+        Route::delete('experts/{user}', [ExpertsWebController::class, 'destroy'])
+            ->name('admin.experts.destroy');
 
         Route::get('bookings', [BookingsWebController::class, 'index'])
             ->name('admin.bookings.index');
@@ -82,6 +86,8 @@ Route::middleware('auth')->group(function () {
             ->name('admin.users.index');
         Route::post('users', [UsersWebController::class, 'store'])
             ->name('admin.users.store');
+        Route::delete('users/{user}', [UsersWebController::class, 'destroy'])
+            ->name('admin.users.destroy');
         Route::get('users/{user}/apply-for-expert', [UsersWebController::class, 'applyForExpert'])
             ->name('admin.users.apply-for-expert');
         Route::post('users/{user}/apply-for-expert', [UsersWebController::class, 'storeExpertApplication'])
@@ -90,5 +96,7 @@ Route::middleware('auth')->group(function () {
             ->name('admin.all-users.index');
         Route::post('all-users/{user}/make-admin', [UsersWebController::class, 'makeAdmin'])
             ->name('admin.all-users.make-admin');
+        Route::delete('all-users/{user}', [UsersWebController::class, 'destroyAny'])
+            ->name('admin.all-users.destroy');
     });
 });

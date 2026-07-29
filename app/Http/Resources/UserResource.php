@@ -25,9 +25,9 @@ class UserResource extends JsonResource
                     : null
             ),
             'expert_profile' => $this->when(
-                $this->user_type === User::USER_TYPE_EXPERT && $this->relationLoaded('approvedExpertApplication'),
-                fn () => $this->approvedExpertApplication
-                    ? new ExpertApplicationResource($this->approvedExpertApplication)
+                $this->user_type === User::USER_TYPE_EXPERT && $this->relationLoaded('expertDetail'),
+                fn () => $this->expertDetail
+                    ? new ExpertResource($this->resource)
                     : null
             ),
         ];

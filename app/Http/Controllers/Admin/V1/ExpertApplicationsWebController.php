@@ -40,15 +40,15 @@ class ExpertApplicationsWebController extends Controller
 
     public function approve(ReviewExpertApplicationRequest $request, ExpertApplication $expert_application): RedirectResponse
     {
-        $this->expertApplicationService->approveByAdmin(
+        $detail = $this->expertApplicationService->approveByAdmin(
             $request->user(),
             $expert_application,
             $request->validated('note')
         );
 
         return redirect()
-            ->route('admin.expert-applications.show', $expert_application)
-            ->with('success', 'Application approved.');
+            ->route('admin.experts.show', $detail->user_id)
+            ->with('success', 'Application approved. Expert profile created.');
     }
 
     public function reject(ReviewExpertApplicationRequest $request, ExpertApplication $expert_application): RedirectResponse
@@ -62,5 +62,15 @@ class ExpertApplicationsWebController extends Controller
         return redirect()
             ->route('admin.expert-applications.show', $expert_application)
             ->with('success', 'Application rejected.');
+    }
+
+    public function destroy(ExpertApplication $expert_application): RedirectResponse
+    {
+        $expert_application->skills()->detach();
+        $expert_application->delete();
+
+        return redirect()
+            ->route('admin.expert-applications.index')
+            ->with('danger', 'Application deleted.');
     }
 }

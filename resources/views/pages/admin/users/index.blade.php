@@ -8,8 +8,28 @@
 @endphp
 
 @section('content')
-    <div x-data="{ createOpen: @json($createHasErrors && ! request()->routeIs('admin.users.apply-for-expert*')) }"
-        @keydown.escape.window="createOpen = false">
+    <div x-data="{
+        createOpen: @json($createHasErrors && ! request()->routeIs('admin.users.apply-for-expert*')),
+        async confirmDelete(e, name) {
+            const form = e.target.closest('form');
+            if (!form || !window.Swal) return;
+            const { isConfirmed } = await window.Swal.fire({
+                title: 'Delete user?',
+                text: name
+                    ? '“' + name + '” will be removed permanently.'
+                    : 'This user will be removed permanently.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete',
+                cancelButtonText: 'Cancel',
+                reverseButtons: true,
+                focusCancel: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+            });
+            if (isConfirmed) form.submit();
+        }
+    }" @keydown.escape.window="createOpen = false">
         <x-common.page-breadcrumb pageTitle="Users" />
 
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -29,7 +49,7 @@
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Email</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Email verified</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Joined</th>
-                            <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Action</th>
+                            <th class="px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Action</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-white/[0.02]">
@@ -41,12 +61,26 @@
                                     {{ $user->email_verified_at?->format('M j, Y') ?? '—' }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
                                     {{ $user->created_at?->format('M j, Y') }}</td>
-                                <td class="px-5 py-4 text-sm">
-                                    <a href="{{ route('admin.users.apply-for-expert', $user) }}">
-                                        <x-ui.button type="button" size="sm" variant="primary" className="!px-3 !py-2">
-                                            Apply for expert
-                                        </x-ui.button>
-                                    </a>
+                                <td class="px-5 py-4 text-right text-sm">
+                                    <div class="inline-flex flex-wrap items-center justify-end gap-3">
+                                        @if (! $user->expert_applications_exists)
+                                            <a href="{{ route('admin.users.apply-for-expert', $user) }}"
+                                                class="font-medium text-brand-500 hover:text-brand-600">
+                                                Apply for expert
+                                            </a>
+                                        @else
+                                            <span class="text-xs text-gray-400 dark:text-gray-500">Application exists</span>
+                                        @endif
+                                        <form action="{{ route('admin.users.destroy', $user) }}" method="post" class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button"
+                                                class="font-medium text-red-600 hover:text-red-700 dark:text-red-400"
+                                                @click="confirmDelete($event, @js($user->name))">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

@@ -18,7 +18,7 @@ class ExpertBookingService
      */
     public function availableSlotsForDate(User $expert, string $date): Collection
     {
-        if ($expert->user_type !== User::USER_TYPE_EXPERT || ! $expert->approvedExpertApplication) {
+        if ($expert->user_type !== User::USER_TYPE_EXPERT || ! $expert->expertDetail) {
             throw ValidationException::withMessages([
                 'expert' => ['The selected expert is not available.'],
             ]);
@@ -69,7 +69,7 @@ class ExpertBookingService
         $expert = User::query()
             ->where('id', (int) $data['expert_id'])
             ->where('user_type', User::USER_TYPE_EXPERT)
-            ->whereHas('approvedExpertApplication')
+            ->whereHas('expertDetail')
             ->first();
 
         if ($expert === null) {

@@ -9,35 +9,38 @@ class ExpertResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $application = $this->approvedExpertApplication;
+        $detail = $this->expertDetail;
 
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'professional_headline' => $application?->professional_headline,
-            'bio' => $application?->bio,
-            'years_of_experience' => $application?->years_of_experience,
-            'registration_value' => $application?->registration_value,
-            'intro_video' => $application?->intro_video,
-            'intro_video_url' => $application?->introVideoUrl(),
-            'languages' => $application?->languages ?? [],
-            'avatar' => $application?->avatar,
-            'avatar_url' => $application?->avatarUrl(),
-            'documents' => $application?->documentsWithUrls() ?? [],
-            'education' => $application?->education,
-            'experience' => $application?->experience,
-            'portfolio' => $application?->portfolio,
-            'category' => $application?->category ? [
-                'id' => $application->category->id,
-                'name' => $application->category->name,
-                'slug' => $application->category->slug,
+            'uuid' => $detail?->uuid,
+            'expert_code' => $detail?->expert_code,
+            'slug' => $detail?->slug,
+            'professional_headline' => $detail?->professional_headline,
+            'bio' => $detail?->bio,
+            'years_of_experience' => $detail?->years_of_experience,
+            'registration_value' => $detail?->registration_value,
+            'intro_video' => $detail?->intro_video,
+            'intro_video_url' => $detail?->introVideoUrl(),
+            'languages' => $detail?->languages ?? [],
+            'avatar' => $detail?->avatar,
+            'avatar_url' => $detail?->avatarUrl(),
+            'documents' => $detail?->documentsWithUrls() ?? [],
+            'education' => $detail?->education,
+            'experience' => $detail?->experience,
+            'portfolio' => $detail?->portfolio,
+            'category' => $detail?->category ? [
+                'id' => $detail->category->id,
+                'name' => $detail->category->name,
+                'slug' => $detail->category->slug,
             ] : null,
-            'subcategory' => $application?->subcategory ? [
-                'id' => $application->subcategory->id,
-                'name' => $application->subcategory->name,
-                'slug' => $application->subcategory->slug,
+            'subcategory' => $detail?->subcategory ? [
+                'id' => $detail->subcategory->id,
+                'name' => $detail->subcategory->name,
+                'slug' => $detail->subcategory->slug,
             ] : null,
-            'skills' => $application?->skills
+            'skills' => $detail?->skills
                 ?->map(fn ($skill) => [
                     'id' => $skill->id,
                     'name' => $skill->name,
