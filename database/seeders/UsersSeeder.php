@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\RegistrationFrom;
 use App\Models\User;
+use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -11,6 +12,7 @@ class UsersSeeder extends Seeder
 {
     public function run(): void
     {
+        $faker = Faker::create();
         $sources = [
             RegistrationFrom::AdminPanel,
             RegistrationFrom::Web,
@@ -24,7 +26,7 @@ class UsersSeeder extends Seeder
             User::query()->updateOrCreate(
                 ['email' => "user{$i}@meetexpert.test"],
                 [
-                    'name' => fake()->name(),
+                    'name' => $faker->name(),
                     'password' => $password,
                     'user_type' => User::USER_TYPE_USER,
                     'registration_from' => $from,

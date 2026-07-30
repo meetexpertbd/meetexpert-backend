@@ -7,6 +7,7 @@ use App\Enums\RegistrationFrom;
 use App\Models\Category;
 use App\Models\ExpertDetail;
 use App\Models\User;
+use Faker\Factory as Faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -15,6 +16,7 @@ class ExpertsSeeder extends Seeder
 {
     public function run(): void
     {
+        $faker = Faker::create();
         $categories = Category::query()
             ->where('is_active', true)
             ->whereNotNull('code_prefix')
@@ -45,7 +47,7 @@ class ExpertsSeeder extends Seeder
                 ->random();
             $skills = $subcategory->skills->random(min(3, $subcategory->skills->count()));
 
-            $name = fake()->name();
+            $name = $faker->name();
             $email = "expert{$i}@meetexpert.test";
 
             $user = User::query()->updateOrCreate(
@@ -76,34 +78,34 @@ class ExpertsSeeder extends Seeder
                 'expert_code' => $expertCode,
                 'slug' => $slug,
                 'status' => ExpertDetailStatus::Active,
-                'professional_headline' => fake()->sentence(6),
-                'bio' => fake()->paragraphs(2, true),
-                'years_of_experience' => fake()->numberBetween(1, 25),
-                'registration_value' => strtoupper(fake()->bothify('REG-####')),
+                'professional_headline' => $faker->sentence(6),
+                'bio' => $faker->paragraphs(2, true),
+                'years_of_experience' => $faker->numberBetween(1, 25),
+                'registration_value' => strtoupper($faker->bothify('REG-####')),
                 'intro_video' => null,
-                'languages' => fake()->randomElements($languages, fake()->numberBetween(1, 3)),
+                'languages' => $faker->randomElements($languages, $faker->numberBetween(1, 3)),
                 'avatar' => null,
                 'documents' => null,
                 'education' => [
                     [
-                        'institution' => fake()->company().' University',
-                        'degree' => fake()->randomElement(['BSc', 'MSc', 'MBBS', 'LLB', 'MBA']),
-                        'year' => fake()->numberBetween(2005, 2022),
+                        'institution' => $faker->company().' University',
+                        'degree' => $faker->randomElement(['BSc', 'MSc', 'MBBS', 'LLB', 'MBA']),
+                        'year' => $faker->numberBetween(2005, 2022),
                     ],
                 ],
                 'experience' => [
                     [
-                        'title' => fake()->jobTitle(),
-                        'organization' => fake()->company(),
-                        'start_year' => fake()->numberBetween(2010, 2018),
-                        'end_year' => fake()->numberBetween(2019, 2025),
-                        'description' => fake()->sentence(),
+                        'title' => $faker->jobTitle(),
+                        'organization' => $faker->company(),
+                        'start_year' => $faker->numberBetween(2010, 2018),
+                        'end_year' => $faker->numberBetween(2019, 2025),
+                        'description' => $faker->sentence(),
                     ],
                 ],
                 'portfolio' => [
                     [
-                        'title' => fake()->words(3, true),
-                        'url' => fake()->url(),
+                        'title' => $faker->words(3, true),
+                        'url' => $faker->url(),
                     ],
                 ],
             ]);
