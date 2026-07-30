@@ -32,6 +32,12 @@
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
             <x-common.page-breadcrumb pageTitle="Expert: {{ $expert->name }}" />
             <div class="flex flex-wrap items-center gap-4">
+                @if ($detail)
+                    <a href="{{ route('admin.experts.edit', $expert) }}"
+                        class="text-sm font-medium text-brand-500 hover:text-brand-600">
+                        Edit details
+                    </a>
+                @endif
                 <form action="{{ route('admin.experts.destroy', $expert) }}" method="post">
                     @csrf
                     @method('DELETE')

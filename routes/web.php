@@ -74,6 +74,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('experts', [ExpertsWebController::class, 'index'])
             ->name('admin.experts.index');
+        Route::get('experts/{user}/edit', [ExpertsWebController::class, 'edit'])
+            ->name('admin.experts.edit');
+        Route::put('experts/{user}', [ExpertsWebController::class, 'update'])
+            ->name('admin.experts.update');
         Route::get('experts/{user}', [ExpertsWebController::class, 'show'])
             ->name('admin.experts.show');
         Route::delete('experts/{user}', [ExpertsWebController::class, 'destroy'])

@@ -43,8 +43,26 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-white/[0.02]">
                         @forelse ($experts as $expert)
+                            @php
+                                $avatarUrl = $expert->expertDetail?->avatarUrl();
+                                $initial = strtoupper(mb_substr(trim($expert->name ?: '?'), 0, 1));
+                            @endphp
                             <tr>
-                                <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">{{ $expert->name }}</td>
+                                <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
+                                    <div class="flex items-center gap-3">
+                                        @if ($avatarUrl)
+                                            <img src="{{ $avatarUrl }}" alt="{{ $expert->name }}"
+                                                class="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-gray-200 dark:ring-gray-700">
+                                        @else
+                                            <div
+                                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600 ring-1 ring-gray-200 dark:bg-white/10 dark:text-gray-300 dark:ring-gray-700"
+                                                aria-hidden="true">
+                                                {{ $initial }}
+                                            </div>
+                                        @endif
+                                        <span>{{ $expert->name }}</span>
+                                    </div>
+                                </td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $expert->email }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">{{ $expert->expertDetail?->expert_code ?? '—' }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
@@ -56,6 +74,12 @@
                                         class="font-medium text-brand-500 hover:text-brand-600">
                                         View
                                     </a>
+                                    @if ($expert->expertDetail)
+                                        <a href="{{ route('admin.experts.edit', $expert) }}"
+                                            class="ml-3 font-medium text-brand-500 hover:text-brand-600">
+                                            Edit
+                                        </a>
+                                    @endif
                                     <form action="{{ route('admin.experts.destroy', $expert) }}" method="post"
                                         class="ml-3 inline-block">
                                         @csrf

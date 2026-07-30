@@ -7,11 +7,17 @@ use App\Models\Category;
 use App\Models\ExpertApplication;
 use App\Models\ExpertDetail;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class ExpertDetailService
 {
+    public function __construct(
+        private FileStorageService $fileStorage
+    ) {}
+
     public function createFromApprovedApplication(ExpertApplication $application): ExpertDetail
     {
         $application->loadMissing(['user', 'category', 'skills']);
@@ -63,6 +69,84 @@ class ExpertDetailService
         return $detail->load(['category', 'subcategory', 'skills', 'user']);
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  list<array{name: string, file: UploadedFile}>  $documents
+     */
+    public function updateByAdmin(
+        ExpertDetail $detail,
+        array $data,
+        ?UploadedFile $avatar = null,
+        array $documents = [],
+        ?UploadedFile $introVideo = null
+    ): ExpertDetail {
+        $detail->loadMissing(['user', 'category']);
+
+        $skillIds = array_values(array_unique(array_map('intval', $data['skill_ids'] ?? [])));
+        $category = Category::query()->findOrFail((int) $data['category_id']);
+
+        return DB::transaction(function () use ($detail, $data, $skillIds, $avatar, $documents, $introVideo, $category) {
+            $directory = 'experts/'.$detail->user_id;
+            $payload = [
+                'category_id' => (int) $data['category_id'],
+                'subcategory_id' => (int) $data['subcategory_id'],
+                'status' => $data['status'] instanceof ExpertDetailStatus
+                    ? $data['status']
+                    : ExpertDetailStatus::from((string) $data['status']),
+                'professional_headline' => $data['professional_headline'],
+                'bio' => $data['bio'],
+                'years_of_experience' => (int) $data['years_of_experience'],
+                'registration_value' => $data['registration_value'],
+                'languages' => array_values($data['languages']),
+                'education' => $data['education'] ?? null,
+                'experience' => $data['experience'] ?? null,
+                'portfolio' => $data['portfolio'] ?? null,
+            ];
+
+            if ((int) $detail->category_id !== (int) $data['category_id']) {
+                $payload['slug'] = $this->generateUniqueSlug(
+                    $category,
+                    $detail->user,
+                    $detail->expert_code,
+                    $detail->id
+                );
+            }
+
+            if ($introVideo !== null) {
+                $this->deleteStoredIntroVideo($detail->intro_video);
+                $payload['intro_video'] = $this->fileStorage->store($introVideo, $directory.'/intro-video');
+            } elseif (array_key_exists('intro_video', $data)) {
+                $url = is_string($data['intro_video']) ? trim($data['intro_video']) : null;
+                $url = $url !== '' ? $url : null;
+                if ($url !== $detail->intro_video) {
+                    $this->deleteStoredIntroVideo($detail->intro_video);
+                }
+                $payload['intro_video'] = $url;
+            }
+
+            if ($avatar !== null) {
+                if ($detail->avatar) {
+                    $this->fileStorage->delete($detail->avatar);
+                }
+                $payload['avatar'] = $this->fileStorage->store($avatar, $directory.'/avatar');
+            }
+
+            if ($documents !== []) {
+                foreach ($detail->documents ?? [] as $doc) {
+                    if (is_array($doc) && ! empty($doc['path'])) {
+                        $this->fileStorage->delete($doc['path']);
+                    }
+                }
+                $payload['documents'] = $this->storeDocuments($documents, $directory.'/documents');
+            }
+
+            $detail->update($payload);
+            $detail->skills()->sync($skillIds);
+
+            return $detail->fresh()->load(['category', 'subcategory', 'skills', 'user']);
+        });
+    }
+
     private function generateUniqueExpertCode(string $prefix): string
     {
         $prefix = rtrim($prefix, '-');
@@ -81,8 +165,12 @@ class ExpertDetailService
         ]);
     }
 
-    private function generateUniqueSlug(Category $category, User $user, string $expertCode): string
-    {
+    private function generateUniqueSlug(
+        Category $category,
+        User $user,
+        string $expertCode,
+        ?int $ignoreDetailId = null
+    ): string {
         $base = Str::slug(implode('-', array_filter([
             $category->slug ?: $category->name,
             $user->name,
@@ -95,11 +183,53 @@ class ExpertDetailService
 
         $candidate = $base;
         $n = 0;
-        while (ExpertDetail::query()->where('slug', $candidate)->exists()) {
+        while (
+            ExpertDetail::query()
+                ->where('slug', $candidate)
+                ->when($ignoreDetailId, fn ($q) => $q->where('id', '!=', $ignoreDetailId))
+                ->exists()
+        ) {
             $n++;
             $candidate = $base.'-'.$n;
         }
 
         return $candidate;
+    }
+
+    private function deleteStoredIntroVideo(?string $value): void
+    {
+        if ($value === null || $value === '' || $this->isExternalUrl($value)) {
+            return;
+        }
+
+        $this->fileStorage->delete($value);
+    }
+
+    private function isExternalUrl(string $value): bool
+    {
+        return str_starts_with($value, 'http://') || str_starts_with($value, 'https://');
+    }
+
+    /**
+     * @param  list<array{name: string, file: UploadedFile}>  $documents
+     * @return list<array{name: string, path: string}>
+     */
+    private function storeDocuments(array $documents, string $directory): array
+    {
+        $stored = [];
+
+        foreach ($documents as $document) {
+            $file = $document['file'] ?? null;
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
+
+            $stored[] = [
+                'name' => trim((string) ($document['name'] ?? '')),
+                'path' => $this->fileStorage->store($file, $directory),
+            ];
+        }
+
+        return $stored;
     }
 }
