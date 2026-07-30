@@ -634,6 +634,26 @@
             }
         },
         "/api/v1/expert/application": {
+            "get": {
+                "tags": [
+                    "Expert Application"
+                ],
+                "summary": "Get the authenticated user’s expert application",
+                "operationId": "a0d99635cd78a7652fba36c3206210e6",
+                "responses": {
+                    "200": {
+                        "description": "Application retrieved (or null if none)"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
             "post": {
                 "tags": [
                     "Expert Application"

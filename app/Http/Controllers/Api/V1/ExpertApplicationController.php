@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\StoreExpertApplicationRequest;
 use App\Http\Resources\ExpertApplicationResource;
 use App\Http\Responses\ApiResponse;
+use App\Models\ExpertApplication;
 use App\Services\ExpertApplicationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 class ExpertApplicationController extends Controller
@@ -15,6 +17,32 @@ class ExpertApplicationController extends Controller
     public function __construct(
         private ExpertApplicationService $expertApplicationService
     ) {}
+
+    #[OA\Get(
+        path: '/api/v1/expert/application',
+        tags: ['Expert Application'],
+        summary: 'Get the authenticated user’s expert application',
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Application retrieved (or null if none)'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+        ]
+    )]
+    public function show(Request $request): JsonResponse
+    {
+        $application = ExpertApplication::query()
+            ->where('user_id', $request->user()->id)
+            ->with(['category', 'subcategory', 'skills'])
+            ->latest('id')
+            ->first();
+
+        return ApiResponse::success(
+            $application
+                ? 'Expert application retrieved.'
+                : 'No expert application found.',
+            $application ? new ExpertApplicationResource($application) : null
+        );
+    }
 
     #[OA\Post(
         path: '/api/v1/expert/application',

@@ -32,6 +32,7 @@ Route::prefix('v1')->group(function (): void {
             Route::post('profile', [AuthController::class, 'updateProfile']);
         });
 
+        Route::get('expert/application', [ExpertApplicationController::class, 'show']);
         Route::post('expert/application', [ExpertApplicationController::class, 'store']);
         Route::get('expert/availability', [ExpertAvailabilityController::class, 'show']);
         Route::put('expert/availability', [ExpertAvailabilityController::class, 'update']);
