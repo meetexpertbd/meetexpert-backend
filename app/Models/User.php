@@ -72,6 +72,11 @@ class User extends Authenticatable
         return $this->hasOne(ExpertDetail::class);
     }
 
+    public function expertSlotPrice(): HasOne
+    {
+        return $this->hasOne(ExpertSlotPrice::class);
+    }
+
     public function expertApplications(): HasMany
     {
         return $this->hasMany(ExpertApplication::class);

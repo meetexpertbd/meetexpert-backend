@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\SyncExpertAvailabilityRequest;
+use App\Http\Requests\Api\V1\UpdateExpertSlotPriceRequest;
 use App\Http\Responses\ApiResponse;
 use App\Models\User;
 use App\Services\ExpertAvailabilityService;
@@ -97,6 +98,87 @@ class ExpertAvailabilityController extends Controller
 
         return ApiResponse::success('Availability schedule saved.', [
             'days' => $this->expertAvailabilityService->getSchedule($user),
+        ]);
+    }
+
+    #[OA\Get(
+        path: '/api/v1/expert/slot-price',
+        tags: ['Expert Availability'],
+        summary: 'Get the authenticated expert’s slot price',
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Slot price retrieved'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Expert account required'),
+            new OA\Response(response: 404, description: 'Expert profile not found'),
+        ]
+    )]
+    public function showSlotPrice(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if ($user->user_type !== User::USER_TYPE_EXPERT) {
+            return ApiResponse::error('Only expert accounts can view slot price.', null, 403);
+        }
+
+        $detail = $user->expertDetail;
+        if ($detail === null) {
+            return ApiResponse::error('Expert profile not found.', null, 404);
+        }
+
+        return ApiResponse::success('Slot price retrieved.', [
+            'slot_price' => $user->expertSlotPrice?->price !== null
+                ? (float) $user->expertSlotPrice->price
+                : null,
+        ]);
+    }
+
+    #[OA\Put(
+        path: '/api/v1/expert/slot-price',
+        tags: ['Expert Availability'],
+        summary: 'Set the authenticated expert’s slot price',
+        security: [['sanctum' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['slot_price'],
+                properties: [
+                    new OA\Property(
+                        property: 'slot_price',
+                        type: 'number',
+                        format: 'float',
+                        minimum: 0,
+                        example: 500.00
+                    ),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: 'Slot price saved'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Expert account required'),
+            new OA\Response(response: 404, description: 'Expert profile not found'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+    public function updateSlotPrice(UpdateExpertSlotPriceRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        if ($user->user_type !== User::USER_TYPE_EXPERT) {
+            return ApiResponse::error('Only expert accounts can set slot price.', null, 403);
+        }
+
+        $detail = $user->expertDetail;
+        if ($detail === null) {
+            return ApiResponse::error('Expert profile not found.', null, 404);
+        }
+
+        $slotPrice = $user->expertSlotPrice()->updateOrCreate(
+            ['user_id' => $user->id],
+            ['price' => $request->validated('slot_price')]
+        );
+
+        return ApiResponse::success('Slot price saved.', [
+            'slot_price' => (float) $slotPrice->price,
         ]);
     }
 }
