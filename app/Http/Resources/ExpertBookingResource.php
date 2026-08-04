@@ -36,6 +36,9 @@ class ExpertBookingResource extends JsonResource
             'user' => $this->whenLoaded('user', fn () => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
+                'email' => $this->user->email,
+                'phone' => $this->user->profile?->phone,
+                'avatar_url' => $this->user->profile?->avatarUrl(),
             ]),
             'availability_slot_id' => $this->expert_availability_slot_id,
             'meeting' => $meeting,

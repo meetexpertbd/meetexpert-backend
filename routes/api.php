@@ -42,6 +42,7 @@ Route::prefix('v1')->group(function (): void {
         Route::put('expert/availability', [ExpertAvailabilityController::class, 'update']);
         Route::get('expert/slot-price', [ExpertAvailabilityController::class, 'showSlotPrice']);
         Route::put('expert/slot-price', [ExpertAvailabilityController::class, 'updateSlotPrice']);
+        Route::get('expert/bookings', [ExpertBookingController::class, 'expertIndex']);
 
         Route::get('bookings', [ExpertBookingController::class, 'index']);
         Route::post('bookings', [ExpertBookingController::class, 'store']);

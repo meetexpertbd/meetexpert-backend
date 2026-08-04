@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\StoreExpertBookingRequest;
 use App\Http\Resources\ExpertBookingResource;
 use App\Http\Responses\ApiResponse;
 use App\Models\ExpertBooking;
+use App\Models\User;
 use App\Services\AgoraMeetingService;
 use App\Services\ExpertBookingService;
 use Illuminate\Http\JsonResponse;
@@ -75,6 +76,68 @@ class ExpertBookingController extends Controller
 
         return ApiResponse::success(
             'Bookings retrieved.',
+            ExpertBookingResource::collection($bookings)
+        );
+    }
+
+    #[OA\Get(
+        path: '/api/v1/expert/bookings',
+        tags: ['Bookings'],
+        summary: 'List bookings for the authenticated expert',
+        security: [['sanctum' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'status',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'string', enum: ['confirmed', 'cancelled'])
+            ),
+            new OA\Parameter(
+                name: 'page',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'integer', minimum: 1)
+            ),
+            new OA\Parameter(
+                name: 'per_page',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'integer', default: 20, minimum: 1, maximum: 100)
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Expert bookings retrieved'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Expert account required'),
+            new OA\Response(response: 422, description: 'Validation error'),
+        ]
+    )]
+    public function expertIndex(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if ($user->user_type !== User::USER_TYPE_EXPERT) {
+            return ApiResponse::error('Only expert accounts can view expert bookings.', null, 403);
+        }
+
+        $validated = $request->validate([
+            'status' => ['sometimes', 'string', 'in:confirmed,cancelled'],
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+        ]);
+
+        $bookings = ExpertBooking::query()
+            ->where('expert_user_id', $user->id)
+            ->when(
+                isset($validated['status']),
+                fn ($query) => $query->where('status', $validated['status'])
+            )
+            ->with(['user.profile'])
+            ->orderByDesc('scheduled_date')
+            ->orderBy('start_time')
+            ->paginate((int) ($validated['per_page'] ?? 20));
+
+        return ApiResponse::success(
+            'Expert bookings retrieved.',
             ExpertBookingResource::collection($bookings)
         );
     }
