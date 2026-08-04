@@ -27,24 +27,51 @@ class ExpertBookingController extends Controller
         security: [['sanctum' => []]],
         parameters: [
             new OA\Parameter(
+                name: 'status',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'string', enum: ['confirmed', 'cancelled'])
+            ),
+            new OA\Parameter(
+                name: 'page',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'integer', minimum: 1)
+            ),
+            new OA\Parameter(
                 name: 'per_page',
                 in: 'query',
+                required: false,
                 schema: new OA\Schema(type: 'integer', default: 20, minimum: 1, maximum: 100)
             ),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Bookings retrieved'),
             new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
     public function index(Request $request): JsonResponse
     {
+        $validated = $request->validate([
+            'status' => ['sometimes', 'string', 'in:confirmed,cancelled'],
+            'page' => ['sometimes', 'integer', 'min:1'],
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+        ]);
+
         $bookings = ExpertBooking::query()
             ->where('user_id', $request->user()->id)
-            ->with('expert')
+            ->when(
+                isset($validated['status']),
+                fn ($query) => $query->where('status', $validated['status'])
+            )
+            ->with([
+                'expert.expertDetail',
+                'expert.expertSlotPrice',
+            ])
             ->orderByDesc('scheduled_date')
             ->orderBy('start_time')
-            ->paginate(min((int) $request->input('per_page', 20), 100));
+            ->paginate((int) ($validated['per_page'] ?? 20));
 
         return ApiResponse::success(
             'Bookings retrieved.',

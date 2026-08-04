@@ -8,6 +8,7 @@ use App\Http\Requests\Api\V1\ListExpertsRequest;
 use App\Http\Resources\ExpertResource;
 use App\Http\Responses\ApiResponse;
 use App\Models\User;
+use App\Services\ExpertAvailabilityService;
 use App\Services\ExpertBookingService;
 use App\Services\ExpertDiscoveryService;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,8 @@ class ExpertController extends Controller
 {
     public function __construct(
         private ExpertDiscoveryService $expertDiscoveryService,
-        private ExpertBookingService $expertBookingService
+        private ExpertBookingService $expertBookingService,
+        private ExpertAvailabilityService $expertAvailabilityService
     ) {}
 
     #[OA\Get(
@@ -80,7 +82,12 @@ class ExpertController extends Controller
 
         return ApiResponse::success(
             'Expert retrieved.',
-            new ExpertResource($expert)
+            array_merge(
+                (new ExpertResource($expert))->resolve(),
+                [
+                    'days' => $this->expertAvailabilityService->getSchedule($expert),
+                ]
+            )
         );
     }
 

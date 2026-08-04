@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\UpdateExpertDetailRequest;
 use App\Http\Resources\ExpertDetailResource;
 use App\Http\Responses\ApiResponse;
+use App\Models\ExpertDetail;
 use App\Models\User;
+use App\Services\ExpertAvailabilityService;
 use App\Services\ExpertDetailService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,13 +17,14 @@ use OpenApi\Attributes as OA;
 class ExpertDetailController extends Controller
 {
     public function __construct(
-        private ExpertDetailService $expertDetailService
+        private ExpertDetailService $expertDetailService,
+        private ExpertAvailabilityService $expertAvailabilityService
     ) {}
 
     #[OA\Get(
         path: '/api/v1/expert/details',
         tags: ['Expert Details'],
-        summary: 'Get the authenticated expert’s profile details',
+        summary: 'Get the authenticated expert’s profile details, weekly slots, and slot price',
         security: [['sanctum' => []]],
         responses: [
             new OA\Response(response: 200, description: 'Expert details retrieved'),
@@ -44,7 +47,7 @@ class ExpertDetailController extends Controller
 
         return ApiResponse::success(
             'Expert details retrieved.',
-            new ExpertDetailResource($detail)
+            $this->detailPayload($user, $detail)
         );
     }
 
@@ -164,7 +167,26 @@ class ExpertDetailController extends Controller
 
         return ApiResponse::success(
             'Expert details updated.',
-            new ExpertDetailResource($detail)
+            $this->detailPayload($user, $detail)
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function detailPayload(User $user, ExpertDetail $detail): array
+    {
+        $user->loadMissing('expertSlotPrice');
+        $detail->loadMissing(['category', 'subcategory', 'skills']);
+
+        return array_merge(
+            (new ExpertDetailResource($detail))->resolve(),
+            [
+                'slot_price' => $user->expertSlotPrice?->price !== null
+                    ? (float) $user->expertSlotPrice->price
+                    : null,
+                'days' => $this->expertAvailabilityService->getSchedule($user),
+            ]
         );
     }
 }

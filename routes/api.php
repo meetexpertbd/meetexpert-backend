@@ -31,6 +31,7 @@ Route::prefix('v1')->group(function (): void {
         Route::prefix('user')->group(function (): void {
             Route::get('profile', [AuthController::class, 'profile']);
             Route::post('profile', [AuthController::class, 'updateProfile']);
+            Route::get('bookings', [ExpertBookingController::class, 'index']);
         });
 
         Route::get('expert/application', [ExpertApplicationController::class, 'show']);

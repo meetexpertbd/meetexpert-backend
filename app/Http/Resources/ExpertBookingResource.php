@@ -27,6 +27,11 @@ class ExpertBookingResource extends JsonResource
             'expert' => $this->whenLoaded('expert', fn () => [
                 'id' => $this->expert->id,
                 'name' => $this->expert->name,
+                'professional_headline' => $this->expert->expertDetail?->professional_headline,
+                'avatar_url' => $this->expert->expertDetail?->avatarUrl(),
+                'slot_price' => $this->expert->expertSlotPrice?->price !== null
+                    ? (float) $this->expert->expertSlotPrice->price
+                    : null,
             ]),
             'user' => $this->whenLoaded('user', fn () => [
                 'id' => $this->user->id,
