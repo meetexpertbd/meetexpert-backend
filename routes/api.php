@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\ExpertApplicationController;
 use App\Http\Controllers\Api\V1\ExpertAvailabilityController;
 use App\Http\Controllers\Api\V1\ExpertBookingController;
 use App\Http\Controllers\Api\V1\ExpertController;
+use App\Http\Controllers\Api\V1\ExpertDetailController;
 use App\Http\Controllers\Api\V1\TaxonomyController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,8 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('expert/application', [ExpertApplicationController::class, 'show']);
         Route::post('expert/application', [ExpertApplicationController::class, 'store']);
+        Route::get('expert/details', [ExpertDetailController::class, 'show']);
+        Route::post('expert/details', [ExpertDetailController::class, 'update']);
         Route::get('expert/availability', [ExpertAvailabilityController::class, 'show']);
         Route::put('expert/availability', [ExpertAvailabilityController::class, 'update']);
 

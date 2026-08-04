@@ -1245,6 +1245,172 @@
                 }
             }
         },
+        "/api/v1/expert/details": {
+            "get": {
+                "tags": [
+                    "Expert Details"
+                ],
+                "summary": "Get the authenticated expert’s profile details",
+                "operationId": "023b6ea34b070680049721f010dce4c1",
+                "responses": {
+                    "200": {
+                        "description": "Expert details retrieved"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Expert account required"
+                    },
+                    "404": {
+                        "description": "Expert details not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Expert Details"
+                ],
+                "summary": "Update the authenticated expert’s profile details",
+                "operationId": "a7b7225914b89ca5aeba09c0bb29c61d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "category_id",
+                                    "subcategory_id",
+                                    "professional_headline",
+                                    "bio",
+                                    "years_of_experience",
+                                    "registration_value",
+                                    "languages",
+                                    "skill_ids"
+                                ],
+                                "properties": {
+                                    "category_id": {
+                                        "type": "integer"
+                                    },
+                                    "subcategory_id": {
+                                        "type": "integer"
+                                    },
+                                    "professional_headline": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "bio": {
+                                        "type": "string",
+                                        "maxLength": 10000
+                                    },
+                                    "years_of_experience": {
+                                        "type": "integer",
+                                        "maximum": 80,
+                                        "minimum": 0
+                                    },
+                                    "registration_value": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "intro_video": {
+                                        "description": "Video file upload or external video URL. Omit to keep current.",
+                                        "nullable": true,
+                                        "oneOf": [
+                                            {
+                                                "type": "string",
+                                                "format": "binary"
+                                            },
+                                            {
+                                                "type": "string",
+                                                "format": "uri",
+                                                "maxLength": 2048
+                                            }
+                                        ]
+                                    },
+                                    "languages": {
+                                        "description": "JSON array string or repeated form fields",
+                                        "type": "string",
+                                        "example": "[\"en\",\"bn\"]"
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "nullable": true
+                                    },
+                                    "documents": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "name",
+                                                "file"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 255
+                                                },
+                                                "file": {
+                                                    "type": "string",
+                                                    "format": "binary"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "nullable": true,
+                                        "maxItems": 10
+                                    },
+                                    "education": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "experience": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "portfolio": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "skill_ids": {
+                                        "description": "JSON array string or repeated form fields",
+                                        "type": "string",
+                                        "example": "[1,2,3]"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Expert details updated"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Expert account required"
+                    },
+                    "404": {
+                        "description": "Expert details not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/v1/taxonomy": {
             "get": {
                 "tags": [
@@ -1294,6 +1460,10 @@
         {
             "name": "Experts",
             "description": "Experts"
+        },
+        {
+            "name": "Expert Details",
+            "description": "Expert Details"
         },
         {
             "name": "Taxonomy",

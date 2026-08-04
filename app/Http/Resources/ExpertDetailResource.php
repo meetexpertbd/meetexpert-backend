@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class ExpertDetailResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'uuid' => $this->uuid,
+            'expert_code' => $this->expert_code,
+            'slug' => $this->slug,
+            'status' => $this->status instanceof \BackedEnum ? $this->status->value : $this->status,
+            'professional_headline' => $this->professional_headline,
+            'bio' => $this->bio,
+            'years_of_experience' => $this->years_of_experience,
+            'registration_value' => $this->registration_value,
+            'intro_video' => $this->intro_video,
+            'intro_video_url' => $this->introVideoUrl(),
+            'languages' => $this->languages ?? [],
+            'avatar' => $this->avatar,
+            'avatar_url' => $this->avatarUrl(),
+            'documents' => $this->documentsWithUrls(),
+            'education' => $this->education,
+            'experience' => $this->experience,
+            'portfolio' => $this->portfolio,
+            'category' => $this->relationLoaded('category') && $this->category ? [
+                'id' => $this->category->id,
+                'name' => $this->category->name,
+                'slug' => $this->category->slug,
+            ] : null,
+            'subcategory' => $this->relationLoaded('subcategory') && $this->subcategory ? [
+                'id' => $this->subcategory->id,
+                'name' => $this->subcategory->name,
+                'slug' => $this->subcategory->slug,
+            ] : null,
+            'skills' => $this->relationLoaded('skills')
+                ? $this->skills->map(fn ($skill) => [
+                    'id' => $skill->id,
+                    'name' => $skill->name,
+                    'slug' => $skill->slug,
+                ])->values()->all()
+                : [],
+            'created_at' => $this->created_at?->toIso8601String(),
+            'updated_at' => $this->updated_at?->toIso8601String(),
+        ];
+    }
+}

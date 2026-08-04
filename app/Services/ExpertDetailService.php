@@ -90,9 +90,6 @@ class ExpertDetailService
             $payload = [
                 'category_id' => (int) $data['category_id'],
                 'subcategory_id' => (int) $data['subcategory_id'],
-                'status' => $data['status'] instanceof ExpertDetailStatus
-                    ? $data['status']
-                    : ExpertDetailStatus::from((string) $data['status']),
                 'professional_headline' => $data['professional_headline'],
                 'bio' => $data['bio'],
                 'years_of_experience' => (int) $data['years_of_experience'],
@@ -102,6 +99,12 @@ class ExpertDetailService
                 'experience' => $data['experience'] ?? null,
                 'portfolio' => $data['portfolio'] ?? null,
             ];
+
+            if (array_key_exists('status', $data) && $data['status'] !== null) {
+                $payload['status'] = $data['status'] instanceof ExpertDetailStatus
+                    ? $data['status']
+                    : ExpertDetailStatus::from((string) $data['status']);
+            }
 
             if ((int) $detail->category_id !== (int) $data['category_id']) {
                 $payload['slug'] = $this->generateUniqueSlug(
@@ -145,6 +148,22 @@ class ExpertDetailService
 
             return $detail->fresh()->load(['category', 'subcategory', 'skills', 'user']);
         });
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  list<array{name: string, file: UploadedFile}>  $documents
+     */
+    public function updateByExpert(
+        ExpertDetail $detail,
+        array $data,
+        ?UploadedFile $avatar = null,
+        array $documents = [],
+        ?UploadedFile $introVideo = null
+    ): ExpertDetail {
+        unset($data['status']);
+
+        return $this->updateByAdmin($detail, $data, $avatar, $documents, $introVideo);
     }
 
     private function generateUniqueExpertCode(string $prefix): string
