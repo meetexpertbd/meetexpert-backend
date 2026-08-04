@@ -21,6 +21,9 @@ class ExpertResource extends JsonResource
             'bio' => $detail?->bio,
             'years_of_experience' => $detail?->years_of_experience,
             'registration_value' => $detail?->registration_value,
+            'slot_price' => $this->expertSlotPrice?->price !== null
+                ? (float) $this->expertSlotPrice->price
+                : null,
             'intro_video' => $detail?->intro_video,
             'intro_video_url' => $detail?->introVideoUrl(),
             'languages' => $detail?->languages ?? [],

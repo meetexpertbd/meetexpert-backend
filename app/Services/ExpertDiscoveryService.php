@@ -49,6 +49,7 @@ class ExpertDiscoveryService
                 'expertDetail.category:id,name,slug,code_prefix',
                 'expertDetail.subcategory:id,category_id,name,slug',
                 'expertDetail.skills:id,subcategory_id,name,slug',
+                'expertSlotPrice',
             ])
             ->orderBy('name')
             ->paginate($perPage)
@@ -65,6 +66,7 @@ class ExpertDiscoveryService
             'expertDetail.category:id,name,slug,code_prefix',
             'expertDetail.subcategory:id,category_id,name,slug',
             'expertDetail.skills:id,subcategory_id,name,slug',
+            'expertSlotPrice',
         ]);
 
         if (! $user->expertDetail || $user->expertDetail->status !== ExpertDetailStatus::Active) {

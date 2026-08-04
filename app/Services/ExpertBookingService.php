@@ -40,9 +40,12 @@ class ExpertBookingService
             ->pluck('expert_availability_slot_id')
             ->all();
 
-        $now = Carbon::now();
+        $expert->loadMissing('expertSlotPrice');
+        $slotPrice = $expert->expertSlotPrice?->price !== null
+            ? (float) $expert->expertSlotPrice->price
+            : null;
 
-        return $slots->map(function (ExpertAvailabilitySlot $slot) use ($scheduledDate, $bookedSlotIds): array {
+        return $slots->map(function (ExpertAvailabilitySlot $slot) use ($scheduledDate, $bookedSlotIds, $slotPrice): array {
             $startsAt = Carbon::parse(
                 $scheduledDate->toDateString().' '.$slot->start_time->format('H:i:s')
             );
@@ -53,6 +56,7 @@ class ExpertBookingService
                 'day_of_week' => (int) $slot->day_of_week,
                 'start' => $slot->start_time->format('H:i'),
                 'end' => $slot->end_time->format('H:i'),
+                'slot_price' => $slotPrice,
                 'is_booked' => $isBooked,
             ];
         })->values();
