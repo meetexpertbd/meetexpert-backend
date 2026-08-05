@@ -66,7 +66,7 @@ class CategoryController extends Controller
 
     private function normalizeCodePrefix(string $prefix): string
     {
-        return preg_replace('/[^A-Za-z0-9]/', '', $prefix) ?? '';
+        return strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $prefix) ?? '');
     }
 
     private function slugFromName(string $name, ?Category $except): string

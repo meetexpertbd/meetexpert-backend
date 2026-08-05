@@ -190,9 +190,9 @@
                         <label for="create_code_prefix" class="{{ $label }}">Code prefix <span class="text-red-500">*</span></label>
                         <input id="create_code_prefix" name="code_prefix" type="text" maxlength="20"
                             value="{{ old('_form') === 'create' ? old('code_prefix') : '' }}"
-                            placeholder="e.g. Dr" required
+                            placeholder="e.g. DR" required style="text-transform: uppercase"
                             class="{{ $input }} @error('code_prefix') border-red-500 @enderror" />
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used for expert codes like Dr-3528.</p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used for expert codes like DR-3528.</p>
                         @error('code_prefix')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -285,9 +285,9 @@
                         <label for="edit_code_prefix" class="{{ $label }}">Code prefix <span class="text-red-500">*</span></label>
                         <input id="edit_code_prefix" name="code_prefix" type="text" maxlength="20" x-ref="editCodePrefix"
                             value="{{ $editHasErrors ? old('code_prefix') : '' }}" required
-                            placeholder="e.g. Dr"
+                            placeholder="e.g. DR" style="text-transform: uppercase"
                             class="{{ $input }} @error('code_prefix') border-red-500 @enderror" />
-                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used for expert codes like Dr-3528.</p>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Used for expert codes like DR-3528.</p>
                         @error('code_prefix')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror

@@ -168,7 +168,7 @@ class ExpertDetailService
 
     private function generateUniqueExpertCode(string $prefix): string
     {
-        $prefix = rtrim($prefix, '-');
+        $prefix = strtoupper(rtrim($prefix, '-'));
 
         for ($attempt = 0; $attempt < 50; $attempt++) {
             $digits = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);

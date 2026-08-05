@@ -23,6 +23,13 @@ class Category extends Model
         ];
     }
 
+    public function setCodePrefixAttribute(?string $value): void
+    {
+        $this->attributes['code_prefix'] = $value === null || $value === ''
+            ? $value
+            : strtoupper($value);
+    }
+
     public function subcategories(): HasMany
     {
         return $this->hasMany(Subcategory::class);

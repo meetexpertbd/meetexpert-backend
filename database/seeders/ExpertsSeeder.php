@@ -118,6 +118,8 @@ class ExpertsSeeder extends Seeder
 
     private function uniqueExpertCode(string $prefix): string
     {
+        $prefix = strtoupper(rtrim($prefix, '-'));
+
         for ($attempt = 0; $attempt < 50; $attempt++) {
             $code = $prefix.'-'.str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
 

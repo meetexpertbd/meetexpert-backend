@@ -47,6 +47,13 @@ class ExpertDetail extends Model
         ];
     }
 
+    public function setExpertCodeAttribute(?string $value): void
+    {
+        $this->attributes['expert_code'] = $value === null || $value === ''
+            ? $value
+            : strtoupper($value);
+    }
+
     public function getRouteKeyName(): string
     {
         return 'uuid';
