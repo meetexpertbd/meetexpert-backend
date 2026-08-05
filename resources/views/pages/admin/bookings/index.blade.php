@@ -26,6 +26,7 @@
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Meeting channel</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Notes</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Booked</th>
+                            <th class="px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-white/[0.02]">
@@ -66,10 +67,16 @@
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
                                     {{ $booking->created_at?->format('M j, Y g:i A') }}
                                 </td>
+                                <td class="px-5 py-4 text-right text-sm">
+                                    <a href="{{ route('admin.bookings.show', $booking) }}"
+                                        class="font-medium text-brand-500 hover:text-brand-600">
+                                        View
+                                    </a>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <td colspan="10" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                                     No bookings yet.
                                 </td>
                             </tr>

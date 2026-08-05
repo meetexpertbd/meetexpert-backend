@@ -85,6 +85,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('bookings', [BookingsWebController::class, 'index'])
             ->name('admin.bookings.index');
+        Route::get('bookings/{booking}', [BookingsWebController::class, 'show'])
+            ->name('admin.bookings.show');
 
         Route::get('users', [UsersWebController::class, 'index'])
             ->name('admin.users.index');
