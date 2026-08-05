@@ -18,6 +18,7 @@ class ExpertBooking extends Model
         'status',
         'notes',
         'agora_channel',
+        'meeting_joins',
     ];
 
     protected function casts(): array
@@ -27,6 +28,7 @@ class ExpertBooking extends Model
             'start_time' => 'datetime:H:i:s',
             'end_time' => 'datetime:H:i:s',
             'status' => ExpertBookingStatus::class,
+            'meeting_joins' => 'array',
         ];
     }
 

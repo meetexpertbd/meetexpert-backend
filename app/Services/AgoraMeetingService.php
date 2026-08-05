@@ -37,7 +37,8 @@ class AgoraMeetingService
      *     scheduled_starts_at: string,
      *     scheduled_ends_at: string,
      *     join_opens_at: string,
-     *     join_closes_at: string
+     *     join_closes_at: string,
+     *     meeting_joins: array{user: array{status: string, joined_at: string|null}, expert: array{status: string, joined_at: string|null}}
      * }
      */
     public function credentialsFor(User $user, ExpertBooking $booking): array
@@ -46,6 +47,7 @@ class AgoraMeetingService
         $this->assertJoinable($booking);
 
         $booking = $this->ensureChannel($booking);
+        $booking = $this->recordJoin($user, $booking);
         $window = $this->meetingWindow($booking);
 
         $appId = config('agora.app_id');
@@ -87,6 +89,7 @@ class AgoraMeetingService
             'scheduled_ends_at' => $window['ends_at']->toIso8601String(),
             'join_opens_at' => $window['join_opens_at']->toIso8601String(),
             'join_closes_at' => $window['join_closes_at']->toIso8601String(),
+            'meeting_joins' => $this->normalizeMeetingJoins($booking->meeting_joins),
         ];
     }
 
@@ -98,7 +101,8 @@ class AgoraMeetingService
      *     join_opens_at: string,
      *     join_closes_at: string,
      *     can_join: bool,
-     *     is_live: bool
+     *     is_live: bool,
+     *     meeting_joins: array{user: array{status: string, joined_at: string|null}, expert: array{status: string, joined_at: string|null}}
      * }
      */
     public function summaryFor(User $user, ExpertBooking $booking): array
@@ -125,7 +129,70 @@ class AgoraMeetingService
             'join_closes_at' => $window['join_closes_at']->toIso8601String(),
             'can_join' => $canJoin,
             'is_live' => $isLive,
+            'meeting_joins' => $this->normalizeMeetingJoins($booking->meeting_joins),
         ];
+    }
+
+    public function recordJoin(User $user, ExpertBooking $booking): ExpertBooking
+    {
+        $role = $this->participantRole($user, $booking);
+        if ($role === null) {
+            return $booking;
+        }
+
+        $joins = $this->normalizeMeetingJoins($booking->meeting_joins);
+
+        if ($joins[$role]['status'] !== 'joined') {
+            $joins[$role] = [
+                'status' => 'joined',
+                'joined_at' => now()->toIso8601String(),
+            ];
+
+            $booking->update(['meeting_joins' => $joins]);
+        }
+
+        return $booking->fresh();
+    }
+
+    /**
+     * @return array{
+     *     user: array{status: string, joined_at: string|null},
+     *     expert: array{status: string, joined_at: string|null}
+     * }
+     */
+    public function normalizeMeetingJoins(?array $joins): array
+    {
+        $defaults = [
+            'user' => ['status' => 'not_joined', 'joined_at' => null],
+            'expert' => ['status' => 'not_joined', 'joined_at' => null],
+        ];
+
+        if ($joins === null) {
+            return $defaults;
+        }
+
+        foreach (['user', 'expert'] as $role) {
+            $entry = $joins[$role] ?? [];
+            $defaults[$role] = [
+                'status' => ($entry['status'] ?? 'not_joined') === 'joined' ? 'joined' : 'not_joined',
+                'joined_at' => $entry['joined_at'] ?? null,
+            ];
+        }
+
+        return $defaults;
+    }
+
+    private function participantRole(User $user, ExpertBooking $booking): ?string
+    {
+        if ($booking->user_id === $user->id) {
+            return 'user';
+        }
+
+        if ($booking->expert_user_id === $user->id) {
+            return 'expert';
+        }
+
+        return null;
     }
 
     /**
