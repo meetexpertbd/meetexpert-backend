@@ -148,6 +148,10 @@ class AgoraMeetingService
         $joinEarly = (int) config('agora.join_early_minutes', 15);
         $joinLate = (int) config('agora.join_late_minutes', 15);
 
+        // Business rule: allow joining up to 1 hour before the slot start time.
+        // This keeps older config values (like 15 minutes) from blocking the flow.
+        $joinEarly = max($joinEarly, 60);
+
         return [
             'starts_at' => $startsAt,
             'ends_at' => $endsAt,
