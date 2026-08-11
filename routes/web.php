@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\V1\BookingsWebController;
 use App\Http\Controllers\Admin\V1\CategoryController;
+use App\Http\Controllers\Admin\V1\ContactMessagesWebController;
 use App\Http\Controllers\Admin\V1\ExpertApplicationsWebController;
 use App\Http\Controllers\Admin\V1\ExpertsWebController;
 use App\Http\Controllers\Admin\V1\SkillController;
@@ -87,6 +88,17 @@ Route::middleware('auth')->group(function () {
             ->name('admin.bookings.index');
         Route::get('bookings/{booking}', [BookingsWebController::class, 'show'])
             ->name('admin.bookings.show');
+
+        Route::get('contact-messages', [ContactMessagesWebController::class, 'index'])
+            ->name('admin.contact-messages.index');
+        Route::get('contact-messages/{contact_message}', [ContactMessagesWebController::class, 'show'])
+            ->name('admin.contact-messages.show');
+        Route::post('contact-messages/{contact_message}/mark-replied', [ContactMessagesWebController::class, 'markReplied'])
+            ->name('admin.contact-messages.mark-replied');
+        Route::post('contact-messages/{contact_message}/mark-unread', [ContactMessagesWebController::class, 'markUnread'])
+            ->name('admin.contact-messages.mark-unread');
+        Route::delete('contact-messages/{contact_message}', [ContactMessagesWebController::class, 'destroy'])
+            ->name('admin.contact-messages.destroy');
 
         Route::get('users', [UsersWebController::class, 'index'])
             ->name('admin.users.index');

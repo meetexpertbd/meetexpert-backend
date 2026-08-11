@@ -46,6 +46,13 @@ class MenuHelper
                 'admin_only' => false,
             ],
             [
+                'icon' => 'inbox',
+                'name' => 'Contact messages',
+                'path' => '/admin/contact-messages',
+                'matchPathPrefix' => '/admin/contact-messages',
+                'admin_only' => false,
+            ],
+            [
                 'icon' => 'users',
                 'name' => 'Users',
                 'path' => '/admin/users',
@@ -93,7 +100,7 @@ class MenuHelper
         $user = auth()->user();
 
         return array_values(array_filter($items, function (array $item) use ($user) {
-            if (!empty($item['admin_only']) && (!$user || $user->user_type !== User::USER_TYPE_ADMIN)) {
+            if (! empty($item['admin_only']) && (! $user || $user->user_type !== User::USER_TYPE_ADMIN)) {
                 return false;
             }
 
@@ -113,6 +120,8 @@ class MenuHelper
             'users' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.25 5.75a2.75 2.75 0 1 1 5.5 0 2.75 2.75 0 0 1-5.5 0ZM11 4.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5ZM4.75 15.25a3.5 3.5 0 0 1 3.5-3.5h5.5a3.5 3.5 0 0 1 3.5 3.5V19h-12.5v-3.75Zm1.5 0a2 2 0 0 1 2-2h5.5a2 2 0 0 1 2 2V17.5h-9.5v-2.25ZM15.75 8.5a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm1.5 0a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0Zm.25 4.25h2a2.75 2.75 0 0 1 2.75 2.75V19H16.5v-3.5a1.25 1.25 0 0 0-1.25-1.25h-1.5a4.23 4.23 0 0 0 2.75-4Z" fill="currentColor"/></svg>',
 
             'bookings' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7 2.75a.75.75 0 0 1 .75.75v1h8.5V3.5a.75.75 0 0 1 1.5 0v1h1.25A2.25 2.25 0 0 1 21.25 6.75v13.5A2.25 2.25 0 0 1 19 22.25H5A2.25 2.25 0 0 1 2.75 20V6.75A2.25 2.25 0 0 1 5 4.5h1.25V3.5A.75.75 0 0 1 7 2.75ZM5 6c-.414 0-.75.336-.75.75v13.5c0 .414.336.75.75.75h14c.414 0 .75-.336.75-.75V6.75A.75.75 0 0 0 19 6H5Zm3.5 4.25a.75.75 0 0 1 .75.75v1.69l1.28 1.28a.75.75 0 1 1-1.06 1.06l-1.5-1.5a.75.75 0 0 1-.22-.53V11a.75.75 0 0 1 .75-.75Zm6 0a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5a.75.75 0 0 1 .75-.75Z" fill="currentColor"/></svg>',
+
+            'inbox' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.25 7A2.75 2.75 0 0 1 6 4.25h12A2.75 2.75 0 0 1 20.75 7v10A2.75 2.75 0 0 1 18 19.75H6A2.75 2.75 0 0 1 3.25 17V7ZM6 5.75c-.69 0-1.25.56-1.25 1.25v6.25h4.13c.31 1.29 1.48 2.25 2.87 2.25s2.56-.96 2.87-2.25h4.13V7c0-.69-.56-1.25-1.25-1.25H6Zm13.25 9.25h-3.39a4.26 4.26 0 0 1-3.86 2.5 4.26 4.26 0 0 1-3.86-2.5H4.75V17c0 .69.56 1.25 1.25 1.25h12c.69 0 1.25-.56 1.25-1.25v-2Z" fill="currentColor"/></svg>',
 
             'taxonomies' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 6.25C5.08579 6.25 4.75 6.58579 4.75 7C4.75 7.41421 5.08579 7.75 5.5 7.75H7C7.41421 7.75 7.75 7.41421 7.75 7C7.75 6.58579 7.41421 6.25 7 6.25H5.5ZM9.25 7C9.25 6.58579 9.58579 6.25 10 6.25H18.5C18.9142 6.25 19.25 6.58579 19.25 7C19.25 7.41421 18.9142 7.75 18.5 7.75H10C9.58579 7.75 9.25 7.41421 9.25 7ZM5.5 11.25C5.08579 11.25 4.75 11.5858 4.75 12C4.75 12.4142 5.08579 12.75 5.5 12.75H7C7.41421 12.75 7.75 12.4142 7.75 12C7.75 11.5858 7.41421 11.25 7 11.25H5.5ZM9.25 12C9.25 11.5858 9.58579 11.25 10 11.25H18.5C18.9142 11.25 19.25 11.5858 19.25 12C19.25 12.4142 18.9142 12.75 18.5 12.75H10C9.58579 12.75 9.25 12.4142 9.25 12ZM5.5 16.25C5.08579 16.25 4.75 16.5858 4.75 17C4.75 17.4142 5.08579 17.75 5.5 17.75H7C7.41421 17.75 7.75 17.4142 7.75 17C7.75 16.5858 7.41421 16.25 7 16.25H5.5ZM9.25 17C9.25 16.5858 9.58579 16.25 10 16.25H18.5C18.9142 16.25 19.25 16.5858 19.25 17C19.25 17.4142 18.9142 17.75 18.5 17.75H10C9.58579 17.75 9.25 17.4142 9.25 17Z" fill="currentColor"></path></svg>',
 

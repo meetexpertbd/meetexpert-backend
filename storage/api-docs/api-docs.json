@@ -792,6 +792,75 @@
                 ]
             }
         },
+        "/api/v1/contact": {
+            "post": {
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Submit a contact us message",
+                "operationId": "1b83620b1759b551e64876d9e0ce5e6e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "phone",
+                                    "subject",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Mentors",
+                                        "maxLength": 255
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "nullable": true
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "01700000000",
+                                        "maxLength": 32
+                                    },
+                                    "subject": {
+                                        "type": "string",
+                                        "maxLength": 255
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "maxLength": 5000
+                                    },
+                                    "preferred_language": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "enum": [
+                                            "bn",
+                                            "en"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Message submitted"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    }
+                }
+            }
+        },
         "/api/v1/expert/application": {
             "get": {
                 "tags": [
@@ -1836,6 +1905,10 @@
         {
             "name": "Bookings",
             "description": "Bookings"
+        },
+        {
+            "name": "Contact",
+            "description": "Contact"
         },
         {
             "name": "Expert Application",

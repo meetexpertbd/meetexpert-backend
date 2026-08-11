@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BookingReviewController;
+use App\Http\Controllers\Api\V1\ContactController;
 use App\Http\Controllers\Api\V1\ExpertApplicationController;
 use App\Http\Controllers\Api\V1\ExpertAvailabilityController;
 use App\Http\Controllers\Api\V1\ExpertBookingController;
@@ -17,6 +18,7 @@ Route::prefix('v1')->group(function (): void {
     Route::get('experts/{slug}/available-slots', [ExpertController::class, 'availableSlots']);
     Route::get('experts/{slug}/reviews', [ExpertController::class, 'reviews']);
     Route::get('experts/{slug}', [ExpertController::class, 'show']);
+    Route::post('contact', [ContactController::class, 'store'])->middleware('throttle:5,1');
     Route::prefix('auth')->group(function (): void {
         Route::post('check-email', [AuthController::class, 'checkEmail']);
         Route::post('register/email', [AuthController::class, 'checkEmail']);
