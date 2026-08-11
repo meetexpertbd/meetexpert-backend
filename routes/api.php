@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BookingReviewController;
 use App\Http\Controllers\Api\V1\ExpertApplicationController;
 use App\Http\Controllers\Api\V1\ExpertAvailabilityController;
 use App\Http\Controllers\Api\V1\ExpertBookingController;
@@ -49,5 +50,8 @@ Route::prefix('v1')->group(function (): void {
         Route::get('bookings/{booking}', [ExpertBookingController::class, 'show']);
         Route::get('bookings/{booking}/meeting', [ExpertBookingController::class, 'meeting']);
         Route::post('bookings/{booking}/cancel', [ExpertBookingController::class, 'cancel']);
+        Route::get('bookings/{booking}/review', [BookingReviewController::class, 'show']);
+        Route::post('bookings/{booking}/review', [BookingReviewController::class, 'store']);
+        Route::put('bookings/{booking}/review', [BookingReviewController::class, 'update']);
     });
 });

@@ -41,6 +41,9 @@ class ExpertBookingResource extends JsonResource
                 'avatar_url' => $this->user->profile?->avatarUrl(),
             ]),
             'availability_slot_id' => $this->expert_availability_slot_id,
+            'review' => $this->whenLoaded('review', fn () => $this->review
+                ? new BookingReviewResource($this->review)
+                : null),
             'meeting_joins' => app(AgoraMeetingService::class)->normalizeMeetingJoins($this->meeting_joins),
             'meeting' => $meeting,
             'created_at' => $this->created_at?->toIso8601String(),

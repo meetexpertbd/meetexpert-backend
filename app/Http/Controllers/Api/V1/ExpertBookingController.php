@@ -69,6 +69,7 @@ class ExpertBookingController extends Controller
             ->with([
                 'expert.expertDetail',
                 'expert.expertSlotPrice',
+                'review',
             ])
             ->orderByDesc('scheduled_date')
             ->orderBy('start_time')
@@ -131,7 +132,7 @@ class ExpertBookingController extends Controller
                 isset($validated['status']),
                 fn ($query) => $query->where('status', $validated['status'])
             )
-            ->with(['user.profile'])
+            ->with(['user.profile', 'review'])
             ->orderByDesc('scheduled_date')
             ->orderBy('start_time')
             ->paginate((int) ($validated['per_page'] ?? 20));
@@ -205,7 +206,7 @@ class ExpertBookingController extends Controller
             return ApiResponse::error('Booking not found.', null, 404);
         }
 
-        $booking->load('expert');
+        $booking->load(['expert', 'review']);
 
         return ApiResponse::success(
             'Booking retrieved.',

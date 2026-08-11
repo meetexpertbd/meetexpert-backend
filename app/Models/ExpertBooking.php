@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ExpertBookingStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ExpertBooking extends Model
 {
@@ -45,5 +46,10 @@ class ExpertBooking extends Model
     public function availabilitySlot(): BelongsTo
     {
         return $this->belongsTo(ExpertAvailabilitySlot::class, 'expert_availability_slot_id');
+    }
+
+    public function review(): HasOne
+    {
+        return $this->hasOne(BookingReview::class);
     }
 }

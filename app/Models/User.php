@@ -104,4 +104,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(ExpertBooking::class, 'expert_user_id');
     }
+
+    public function bookingReviews(): HasMany
+    {
+        return $this->hasMany(BookingReview::class);
+    }
+
+    public function receivedBookingReviews(): HasMany
+    {
+        return $this->hasMany(BookingReview::class, 'expert_user_id');
+    }
 }
