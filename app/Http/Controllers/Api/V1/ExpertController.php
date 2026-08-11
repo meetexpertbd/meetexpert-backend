@@ -9,7 +9,6 @@ use App\Http\Resources\BookingReviewResource;
 use App\Http\Resources\ExpertResource;
 use App\Http\Responses\ApiResponse;
 use App\Models\BookingReview;
-use App\Models\User;
 use App\Services\ExpertAvailabilityService;
 use App\Services\ExpertBookingService;
 use App\Services\ExpertDiscoveryService;
@@ -58,15 +57,15 @@ class ExpertController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/v1/experts/{user}',
+        path: '/api/v1/experts/{slug}',
         tags: ['Experts'],
         summary: 'Get an approved expert',
         parameters: [
             new OA\Parameter(
-                name: 'user',
+                name: 'slug',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'integer')
+                schema: new OA\Schema(type: 'string')
             ),
         ],
         responses: [
@@ -74,9 +73,9 @@ class ExpertController extends Controller
             new OA\Response(response: 404, description: 'Expert not found'),
         ]
     )]
-    public function show(User $user): JsonResponse
+    public function show(string $slug): JsonResponse
     {
-        $expert = $this->expertDiscoveryService->findPublicExpert($user);
+        $expert = $this->expertDiscoveryService->findPublicExpertBySlug($slug);
 
         if ($expert === null) {
             return ApiResponse::error('Expert not found.', null, 404);
@@ -94,15 +93,15 @@ class ExpertController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/v1/experts/{user}/available-slots',
+        path: '/api/v1/experts/{slug}/available-slots',
         tags: ['Experts'],
         summary: 'List an expert’s available slots for a date',
         parameters: [
             new OA\Parameter(
-                name: 'user',
+                name: 'slug',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'integer')
+                schema: new OA\Schema(type: 'string')
             ),
             new OA\Parameter(
                 name: 'date',
@@ -117,9 +116,9 @@ class ExpertController extends Controller
             new OA\Response(response: 422, description: 'Validation error'),
         ]
     )]
-    public function availableSlots(ListExpertAvailableSlotsRequest $request, User $user): JsonResponse
+    public function availableSlots(ListExpertAvailableSlotsRequest $request, string $slug): JsonResponse
     {
-        $expert = $this->expertDiscoveryService->findPublicExpert($user);
+        $expert = $this->expertDiscoveryService->findPublicExpertBySlug($slug);
 
         if ($expert === null) {
             return ApiResponse::error('Expert not found.', null, 404);
@@ -137,15 +136,15 @@ class ExpertController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/v1/experts/{user}/reviews',
+        path: '/api/v1/experts/{slug}/reviews',
         tags: ['Experts'],
         summary: 'List reviews for an expert',
         parameters: [
             new OA\Parameter(
-                name: 'user',
+                name: 'slug',
                 in: 'path',
                 required: true,
-                schema: new OA\Schema(type: 'integer')
+                schema: new OA\Schema(type: 'string')
             ),
             new OA\Parameter(
                 name: 'page',
@@ -159,9 +158,9 @@ class ExpertController extends Controller
             new OA\Response(response: 404, description: 'Expert not found'),
         ]
     )]
-    public function reviews(User $user): JsonResponse
+    public function reviews(string $slug): JsonResponse
     {
-        $expert = $this->expertDiscoveryService->findPublicExpert($user);
+        $expert = $this->expertDiscoveryService->findPublicExpertBySlug($slug);
 
         if ($expert === null) {
             return ApiResponse::error('Expert not found.', null, 404);

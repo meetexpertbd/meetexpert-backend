@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\ExpertDetailStatus;
+use App\Models\ExpertDetail;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -74,5 +75,19 @@ class ExpertDiscoveryService
         }
 
         return $user;
+    }
+
+    public function findPublicExpertBySlug(string $slug): ?User
+    {
+        $detail = ExpertDetail::query()
+            ->where('slug', $slug)
+            ->where('status', ExpertDetailStatus::Active)
+            ->first();
+
+        if ($detail === null || $detail->user === null) {
+            return null;
+        }
+
+        return $this->findPublicExpert($detail->user);
     }
 }

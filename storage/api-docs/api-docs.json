@@ -1503,20 +1503,20 @@
                 }
             }
         },
-        "/api/v1/experts/{user}": {
+        "/api/v1/experts/{slug}": {
             "get": {
                 "tags": [
                     "Experts"
                 ],
                 "summary": "Get an approved expert",
-                "operationId": "599f1d7b56c7219145ab02c8b3b74db6",
+                "operationId": "606f8ec7cf510c9f9aacec9bacd06245",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "slug",
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     }
                 ],
@@ -1530,20 +1530,20 @@
                 }
             }
         },
-        "/api/v1/experts/{user}/available-slots": {
+        "/api/v1/experts/{slug}/available-slots": {
             "get": {
                 "tags": [
                     "Experts"
                 ],
                 "summary": "List an expert’s available slots for a date",
-                "operationId": "b1a3b335fd273f3b3130c6eb33e09aaf",
+                "operationId": "887f743bae7dc1d0285a740a668a2999",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "slug",
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     },
                     {
@@ -1569,20 +1569,20 @@
                 }
             }
         },
-        "/api/v1/experts/{user}/reviews": {
+        "/api/v1/experts/{slug}/reviews": {
             "get": {
                 "tags": [
                     "Experts"
                 ],
                 "summary": "List reviews for an expert",
-                "operationId": "6c35c7b572bb1e175b4f9653e50dcea7",
+                "operationId": "30a466aa66d3f3d3c582154752804902",
                 "parameters": [
                     {
-                        "name": "user",
+                        "name": "slug",
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "type": "integer"
+                            "type": "string"
                         }
                     },
                     {
