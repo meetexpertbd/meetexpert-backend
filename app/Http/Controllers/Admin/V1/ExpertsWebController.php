@@ -26,7 +26,7 @@ class ExpertsWebController extends Controller
             ->with('expertDetail')
             ->withCount(['expertAvailabilitySlots'])
             ->orderBy('name')
-            ->paginate(20);
+            ->get();
 
         return view('pages.admin.experts.index', [
             'title' => 'Experts',

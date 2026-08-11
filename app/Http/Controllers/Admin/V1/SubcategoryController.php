@@ -20,7 +20,7 @@ class SubcategoryController extends Controller
             ->orderBy('category_id')
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->paginate(15);
+            ->get();
 
         $parentCategories = Category::query()->orderBy('name')->get();
 

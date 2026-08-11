@@ -20,7 +20,7 @@ class ExpertApplicationsWebController extends Controller
         $applications = ExpertApplication::query()
             ->with(['user', 'category', 'subcategory', 'skills'])
             ->latest()
-            ->paginate(20);
+            ->get();
 
         return view('pages.admin.expert-applications.index', [
             'title' => 'Expert applications',

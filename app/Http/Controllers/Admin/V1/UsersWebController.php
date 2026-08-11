@@ -26,7 +26,7 @@ class UsersWebController extends Controller
             ->where('user_type', User::USER_TYPE_USER)
             ->withExists('expertApplications')
             ->orderBy('name')
-            ->paginate(25);
+            ->get();
 
         return view('pages.admin.users.index', [
             'title' => 'Users',
@@ -233,7 +233,7 @@ class UsersWebController extends Controller
     {
         $users = User::query()
             ->orderBy('name')
-            ->paginate(25);
+            ->get();
 
         return view('pages.admin.users.all-types', [
             'title' => 'All types users',

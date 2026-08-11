@@ -13,8 +13,8 @@
         </div>
 
         <x-common.component-card title="All bookings">
-            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+            <div class="admin-datatable rounded-xl border border-gray-200 dark:border-gray-800">
+                <table class="js-datatable min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                     <thead class="bg-gray-50 dark:bg-white/[0.03]">
                         <tr>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">ID</th>
@@ -26,11 +26,11 @@
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Meeting channel</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Notes</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Booked</th>
-                            <th class="px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Actions</th>
+                            <th class="no-sort px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-white/[0.02]">
-                        @forelse ($bookings as $booking)
+                        @foreach ($bookings as $booking)
                             @php
                                 $statusClass = match ($booking->status) {
                                     ExpertBookingStatus::Confirmed => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
@@ -74,22 +74,10 @@
                                     </a>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="10" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    No bookings yet.
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
-
-            @if ($bookings->hasPages())
-                <div class="mt-6">
-                    {{ $bookings->links() }}
-                </div>
-            @endif
         </x-common.component-card>
     </div>
 @endsection

@@ -19,7 +19,7 @@ class BookingsWebController extends Controller
             ->with(['user', 'expert'])
             ->orderByDesc('scheduled_date')
             ->orderBy('start_time')
-            ->paginate(20);
+            ->get();
 
         return view('pages.admin.bookings.index', [
             'title' => 'Bookings',

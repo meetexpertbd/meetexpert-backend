@@ -17,7 +17,7 @@ class CategoryController extends Controller
         $categories = Category::query()
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->paginate(15);
+            ->get();
 
         return view('pages.taxonomy.categories.index', [
             'title' => 'Categories',

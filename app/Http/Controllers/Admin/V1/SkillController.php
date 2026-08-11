@@ -21,7 +21,7 @@ class SkillController extends Controller
             ->orderBy('subcategory_id')
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->paginate(20);
+            ->get();
 
         $categoriesPayload = Category::query()
             ->with(['subcategories' => fn ($q) => $q->orderBy('name')])

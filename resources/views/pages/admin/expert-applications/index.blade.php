@@ -33,8 +33,8 @@
         </div>
 
         <x-common.component-card title="All applications">
-            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+            <div class="admin-datatable rounded-xl border border-gray-200 dark:border-gray-800">
+                <table class="js-datatable min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                     <thead class="bg-gray-50 dark:bg-white/[0.03]">
                         <tr>
                             <th
@@ -62,13 +62,13 @@
                                 Submitted
                             </th>
                             <th
-                                class="px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                                class="no-sort px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
                                 Actions
                             </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-white/[0.02]">
-                        @forelse ($applications as $application)
+                        @foreach ($applications as $application)
                             @php
                                 $statusClass = match ($application->status) {
                                     ExpertApplicationStatus::Pending => 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
@@ -120,22 +120,10 @@
                                     </form>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    No applications yet.
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
-
-            @if ($applications->hasPages())
-                <div class="mt-6">
-                    {{ $applications->links() }}
-                </div>
-            @endif
         </x-common.component-card>
     </div>
 @endsection

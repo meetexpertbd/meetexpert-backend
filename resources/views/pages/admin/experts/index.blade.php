@@ -29,8 +29,8 @@
         </div>
 
         <x-common.component-card title="All experts">
-            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-800">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+            <div class="admin-datatable rounded-xl border border-gray-200 dark:border-gray-800">
+                <table class="js-datatable min-w-full divide-y divide-gray-200 dark:divide-gray-800">
                     <thead class="bg-gray-50 dark:bg-white/[0.03]">
                         <tr>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Name</th>
@@ -38,11 +38,11 @@
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Expert code</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Registration from</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Availability slots</th>
-                            <th class="px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Actions</th>
+                            <th class="no-sort px-5 py-3 text-right text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-white/[0.02]">
-                        @forelse ($experts as $expert)
+                        @foreach ($experts as $expert)
                             @php
                                 $avatarUrl = $expert->expertDetail?->avatarUrl();
                                 $initial = strtoupper(mb_substr(trim($expert->name ?: '?'), 0, 1));
@@ -92,22 +92,10 @@
                                     </form>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-5 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    No experts yet.
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
-
-            @if ($experts->hasPages())
-                <div class="mt-6">
-                    {{ $experts->links() }}
-                </div>
-            @endif
         </x-common.component-card>
     </div>
 @endsection
