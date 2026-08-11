@@ -17,6 +17,7 @@ class BookingReviewResource extends JsonResource
             'user' => $this->whenLoaded('user', fn () => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
+                'avatar_url' => $this->user->profile?->avatarUrl(),
             ]),
             'expert' => $this->whenLoaded('expert', fn () => [
                 'id' => $this->expert->id,

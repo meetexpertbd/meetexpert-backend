@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\ListExpertAvailableSlotsRequest;
 use App\Http\Requests\Api\V1\ListExpertsRequest;
+use App\Http\Resources\BookingReviewResource;
 use App\Http\Resources\ExpertResource;
 use App\Http\Responses\ApiResponse;
+use App\Models\BookingReview;
 use App\Models\User;
 use App\Services\ExpertAvailabilityService;
 use App\Services\ExpertBookingService;
@@ -131,6 +133,56 @@ class ExpertController extends Controller
         return ApiResponse::success('Available slots retrieved.', [
             'date' => $request->validated('date'),
             'slots' => $slots,
+        ]);
+    }
+
+    #[OA\Get(
+        path: '/api/v1/experts/{user}/reviews',
+        tags: ['Experts'],
+        summary: 'List reviews for an expert',
+        parameters: [
+            new OA\Parameter(
+                name: 'user',
+                in: 'path',
+                required: true,
+                schema: new OA\Schema(type: 'integer')
+            ),
+            new OA\Parameter(
+                name: 'page',
+                in: 'query',
+                required: false,
+                schema: new OA\Schema(type: 'integer', minimum: 1)
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Reviews retrieved'),
+            new OA\Response(response: 404, description: 'Expert not found'),
+        ]
+    )]
+    public function reviews(User $user): JsonResponse
+    {
+        $expert = $this->expertDiscoveryService->findPublicExpert($user);
+
+        if ($expert === null) {
+            return ApiResponse::error('Expert not found.', null, 404);
+        }
+
+        $reviews = BookingReview::query()
+            ->where('expert_user_id', $expert->id)
+            ->with(['user.profile'])
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return ApiResponse::success('Reviews retrieved.', [
+            'total_reviews' => $reviews->total(),
+            'reviews' => BookingReviewResource::collection($reviews->getCollection()),
+            'pagination' => [
+                'current_page' => $reviews->currentPage(),
+                'per_page' => $reviews->perPage(),
+                'last_page' => $reviews->lastPage(),
+                'total' => $reviews->total(),
+            ],
         ]);
     }
 }

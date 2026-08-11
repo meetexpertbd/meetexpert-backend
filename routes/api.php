@@ -14,6 +14,7 @@ Route::prefix('v1')->group(function (): void {
     Route::get('taxonomy', [TaxonomyController::class, 'index']);
     Route::get('experts', [ExpertController::class, 'index']);
     Route::get('experts/{user}/available-slots', [ExpertController::class, 'availableSlots']);
+    Route::get('experts/{user}/reviews', [ExpertController::class, 'reviews']);
     Route::get('experts/{user}', [ExpertController::class, 'show']);
     Route::prefix('auth')->group(function (): void {
         Route::post('check-email', [AuthController::class, 'checkEmail']);
