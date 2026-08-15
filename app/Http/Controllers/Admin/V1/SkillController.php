@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\V1\BulkDestroyRequest;
 use App\Http\Requests\Admin\V1\StoreSkillsRequest;
 use App\Http\Requests\Admin\V1\UpdateSkillRequest;
 use App\Models\Category;
 use App\Models\Skill;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -106,6 +108,38 @@ class SkillController extends Controller
         return redirect()
             ->route('taxonomy.skills.index')
             ->with('danger', 'Skill deleted.');
+    }
+
+    public function bulkDestroy(BulkDestroyRequest $request): RedirectResponse
+    {
+        $deleted = 0;
+        $blocked = 0;
+
+        foreach (Skill::query()->whereIn('id', $request->ids())->get() as $skill) {
+            try {
+                $skill->delete();
+                $deleted++;
+            } catch (QueryException) {
+                $blocked++;
+            }
+        }
+
+        if ($deleted === 0) {
+            return redirect()
+                ->route('taxonomy.skills.index')
+                ->with('danger', $blocked > 0
+                    ? 'Skills could not be deleted because they are in use.'
+                    : 'No records were deleted.');
+        }
+
+        $message = $deleted === 1 ? 'Skill deleted.' : $deleted.' skills deleted.';
+        if ($blocked > 0) {
+            $message .= ' Some could not be deleted because they are in use.';
+        }
+
+        return redirect()
+            ->route('taxonomy.skills.index')
+            ->with($blocked > 0 ? 'info' : 'danger', $message);
     }
 
     private function slugFromName(string $name, int $subcategoryId, ?Skill $except): string

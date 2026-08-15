@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\V1\AdminsWebController;
 use App\Http\Controllers\Admin\V1\BookingsWebController;
 use App\Http\Controllers\Admin\V1\CategoryController;
 use App\Http\Controllers\Admin\V1\ContactMessagesWebController;
@@ -35,6 +36,8 @@ Route::middleware('auth')->group(function () {
         return view('pages.dashboard.ecommerce', ['title' => 'E-commerce Dashboard']);
     })->name('dashboard');
 
+    Route::delete('taxonomy/categories/bulk-destroy', [CategoryController::class, 'bulkDestroy'])
+        ->name('taxonomy.categories.bulk-destroy');
     Route::resource('taxonomy/categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy'])->names([
         'index' => 'taxonomy.categories.index',
         'store' => 'taxonomy.categories.store',
@@ -42,6 +45,8 @@ Route::middleware('auth')->group(function () {
         'destroy' => 'taxonomy.categories.destroy',
     ]);
 
+    Route::delete('taxonomy/subcategories/bulk-destroy', [SubcategoryController::class, 'bulkDestroy'])
+        ->name('taxonomy.subcategories.bulk-destroy');
     Route::resource('taxonomy/subcategories', SubcategoryController::class)->only(['index', 'store', 'update', 'destroy'])->names([
         'index' => 'taxonomy.subcategories.index',
         'store' => 'taxonomy.subcategories.store',
@@ -49,6 +54,8 @@ Route::middleware('auth')->group(function () {
         'destroy' => 'taxonomy.subcategories.destroy',
     ]);
 
+    Route::delete('taxonomy/skills/bulk-destroy', [SkillController::class, 'bulkDestroy'])
+        ->name('taxonomy.skills.bulk-destroy');
     Route::resource('taxonomy/skills', SkillController::class)->only(['index', 'store', 'update', 'destroy'])->names([
         'index' => 'taxonomy.skills.index',
         'store' => 'taxonomy.skills.store',
@@ -64,6 +71,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('expert-applications', [ExpertApplicationsWebController::class, 'index'])
             ->name('admin.expert-applications.index');
+        Route::delete('expert-applications/bulk-destroy', [ExpertApplicationsWebController::class, 'bulkDestroy'])
+            ->name('admin.expert-applications.bulk-destroy');
         Route::get('expert-applications/{expert_application}', [ExpertApplicationsWebController::class, 'show'])
             ->name('admin.expert-applications.show');
         Route::post('expert-applications/{expert_application}/approve', [ExpertApplicationsWebController::class, 'approve'])
@@ -75,6 +84,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('experts', [ExpertsWebController::class, 'index'])
             ->name('admin.experts.index');
+        Route::delete('experts/bulk-destroy', [ExpertsWebController::class, 'bulkDestroy'])
+            ->name('admin.experts.bulk-destroy');
         Route::get('experts/{user}/edit', [ExpertsWebController::class, 'edit'])
             ->name('admin.experts.edit');
         Route::put('experts/{user}', [ExpertsWebController::class, 'update'])
@@ -86,6 +97,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('bookings', [BookingsWebController::class, 'index'])
             ->name('admin.bookings.index');
+        Route::delete('bookings/bulk-destroy', [BookingsWebController::class, 'bulkDestroy'])
+            ->name('admin.bookings.bulk-destroy');
         Route::get('bookings/{booking}', [BookingsWebController::class, 'show'])
             ->name('admin.bookings.show');
 
@@ -104,17 +117,22 @@ Route::middleware('auth')->group(function () {
             ->name('admin.users.index');
         Route::post('users', [UsersWebController::class, 'store'])
             ->name('admin.users.store');
+        Route::delete('users/bulk-destroy', [UsersWebController::class, 'bulkDestroy'])
+            ->name('admin.users.bulk-destroy');
         Route::delete('users/{user}', [UsersWebController::class, 'destroy'])
             ->name('admin.users.destroy');
         Route::get('users/{user}/apply-for-expert', [UsersWebController::class, 'applyForExpert'])
             ->name('admin.users.apply-for-expert');
         Route::post('users/{user}/apply-for-expert', [UsersWebController::class, 'storeExpertApplication'])
             ->name('admin.users.apply-for-expert.store');
-        Route::get('all-users', [UsersWebController::class, 'allTypes'])
-            ->name('admin.all-users.index');
-        Route::post('all-users/{user}/make-admin', [UsersWebController::class, 'makeAdmin'])
-            ->name('admin.all-users.make-admin');
-        Route::delete('all-users/{user}', [UsersWebController::class, 'destroyAny'])
-            ->name('admin.all-users.destroy');
+
+        Route::get('admins', [AdminsWebController::class, 'index'])
+            ->name('admin.admins.index');
+        Route::post('admins', [AdminsWebController::class, 'store'])
+            ->name('admin.admins.store');
+        Route::delete('admins/bulk-destroy', [AdminsWebController::class, 'bulkDestroy'])
+            ->name('admin.admins.bulk-destroy');
+        Route::delete('admins/{user}', [AdminsWebController::class, 'destroy'])
+            ->name('admin.admins.destroy');
     });
 });

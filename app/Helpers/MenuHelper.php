@@ -60,10 +60,11 @@ class MenuHelper
                 'admin_only' => false,
             ],
             [
-                'icon' => 'users',
-                'name' => 'All types users',
-                'path' => '/admin/all-users',
-                'matchPathPrefix' => '/admin/all-users',
+                'icon' => 'admins',
+                'name' => 'Admins',
+                'path' => '/admin/admins',
+                'matchPathPrefix' => '/admin/admins',
+                'admin_only' => false,
             ],
             /* [
                 'icon' => 'authentication',
@@ -118,6 +119,8 @@ class MenuHelper
             'experts' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.25 6.5a2.25 2.25 0 1 1 4.5 0 2.25 2.25 0 0 1-4.5 0ZM10.5 4.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5ZM5.5 14.5a3.25 3.25 0 0 1 3.25-3.25h3.5a3.25 3.25 0 0 1 3.25 3.25V19h-10v-4.5Zm1.5 0a1.75 1.75 0 0 1 1.75-1.75h3.5a1.75 1.75 0 0 1 1.75 1.75V17.5H7v-3Zm8.75-6.75a2.25 2.25 0 1 1 4.5 0 2.25 2.25 0 0 1-4.5 0Zm2.25-2.25a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Zm-1.5 9.5a3.25 3.25 0 0 0-1.45-2.71 3.25 3.25 0 0 1 2.2-.79h.5a3.25 3.25 0 0 1 3.25 3.25V19H16.5v-4.5Z" fill="currentColor"/></svg>',
 
             'users' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.25 5.75a2.75 2.75 0 1 1 5.5 0 2.75 2.75 0 0 1-5.5 0ZM11 4.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5ZM4.75 15.25a3.5 3.5 0 0 1 3.5-3.5h5.5a3.5 3.5 0 0 1 3.5 3.5V19h-12.5v-3.75Zm1.5 0a2 2 0 0 1 2-2h5.5a2 2 0 0 1 2 2V17.5h-9.5v-2.25ZM15.75 8.5a2 2 0 1 1 4 0 2 2 0 0 1-4 0Zm1.5 0a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0Zm.25 4.25h2a2.75 2.75 0 0 1 2.75 2.75V19H16.5v-3.5a1.25 1.25 0 0 0-1.25-1.25h-1.5a4.23 4.23 0 0 0 2.75-4Z" fill="currentColor"/></svg>',
+
+            'admins' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2.25c.22 0 .43.06.62.18l7.25 4.35A1.25 1.25 0 0 1 20.5 7.85v5.02c0 4.18-2.72 7.96-6.72 9.32l-1.4.48a1.25 1.25 0 0 1-.76 0l-1.4-.48C6.22 20.83 3.5 17.05 3.5 12.87V7.85c0-.44.23-.85.63-1.07l7.25-4.35c.19-.12.4-.18.62-.18Zm0 1.72L5 8.07v4.8c0 3.48 2.24 6.64 5.56 7.77l1.44.49 1.44-.49C16.76 19.51 19 16.35 19 12.87v-4.8L12 3.97ZM12 7.25a2.25 2.25 0 1 1 0 4.5 2.25 2.25 0 0 1 0-4.5Zm-3.25 7.1c.48-1.4 1.78-2.35 3.25-2.35s2.77.95 3.25 2.35c.12.36-.15.75-.53.75h-5.44c-.38 0-.65-.39-.53-.75Z" fill="currentColor"/></svg>',
 
             'bookings' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7 2.75a.75.75 0 0 1 .75.75v1h8.5V3.5a.75.75 0 0 1 1.5 0v1h1.25A2.25 2.25 0 0 1 21.25 6.75v13.5A2.25 2.25 0 0 1 19 22.25H5A2.25 2.25 0 0 1 2.75 20V6.75A2.25 2.25 0 0 1 5 4.5h1.25V3.5A.75.75 0 0 1 7 2.75ZM5 6c-.414 0-.75.336-.75.75v13.5c0 .414.336.75.75.75h14c.414 0 .75-.336.75-.75V6.75A.75.75 0 0 0 19 6H5Zm3.5 4.25a.75.75 0 0 1 .75.75v1.69l1.28 1.28a.75.75 0 1 1-1.06 1.06l-1.5-1.5a.75.75 0 0 1-.22-.53V11a.75.75 0 0 1 .75-.75Zm6 0a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5a.75.75 0 0 1 .75-.75Z" fill="currentColor"/></svg>',
 

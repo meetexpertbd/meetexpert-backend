@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\V1\BulkDestroyRequest;
 use App\Http\Requests\Admin\V1\StoreSubcategoryRequest;
 use App\Http\Requests\Admin\V1\UpdateSubcategoryRequest;
 use App\Models\Category;
 use App\Models\Subcategory;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -74,6 +76,38 @@ class SubcategoryController extends Controller
         return redirect()
             ->route('taxonomy.subcategories.index')
             ->with('danger', 'Subcategory deleted.');
+    }
+
+    public function bulkDestroy(BulkDestroyRequest $request): RedirectResponse
+    {
+        $deleted = 0;
+        $blocked = 0;
+
+        foreach (Subcategory::query()->whereIn('id', $request->ids())->get() as $subcategory) {
+            try {
+                $subcategory->delete();
+                $deleted++;
+            } catch (QueryException) {
+                $blocked++;
+            }
+        }
+
+        if ($deleted === 0) {
+            return redirect()
+                ->route('taxonomy.subcategories.index')
+                ->with('danger', $blocked > 0
+                    ? 'Subcategories could not be deleted because they are in use.'
+                    : 'No records were deleted.');
+        }
+
+        $message = $deleted === 1 ? 'Subcategory deleted.' : $deleted.' subcategories deleted.';
+        if ($blocked > 0) {
+            $message .= ' Some could not be deleted because they are in use.';
+        }
+
+        return redirect()
+            ->route('taxonomy.subcategories.index')
+            ->with($blocked > 0 ? 'info' : 'danger', $message);
     }
 
     private function slugFromName(string $name, int $categoryId, ?Subcategory $except): string

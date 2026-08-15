@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\V1\BulkDestroyRequest;
 use App\Models\ExpertBooking;
 use App\Services\AgoraMeetingService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class BookingsWebController extends Controller
@@ -45,5 +47,20 @@ class BookingsWebController extends Controller
             'meetingJoins' => $meetingJoins,
             'window' => $window,
         ]);
+    }
+
+    public function bulkDestroy(BulkDestroyRequest $request): RedirectResponse
+    {
+        $count = ExpertBooking::query()->whereIn('id', $request->ids())->delete();
+
+        if ($count === 0) {
+            return redirect()
+                ->route('admin.bookings.index')
+                ->with('danger', 'No bookings were deleted.');
+        }
+
+        return redirect()
+            ->route('admin.bookings.index')
+            ->with('danger', $count === 1 ? 'Booking deleted.' : $count.' bookings deleted.');
     }
 }

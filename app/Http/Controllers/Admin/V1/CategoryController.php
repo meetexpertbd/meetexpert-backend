@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\V1\BulkDestroyRequest;
 use App\Http\Requests\Admin\V1\StoreCategoryRequest;
 use App\Http\Requests\Admin\V1\UpdateCategoryRequest;
 use App\Models\Category;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -62,6 +64,46 @@ class CategoryController extends Controller
         return redirect()
             ->route('taxonomy.categories.index')
             ->with('danger', 'Category deleted.');
+    }
+
+    public function bulkDestroy(BulkDestroyRequest $request): RedirectResponse
+    {
+        return $this->bulkDeleteRedirect(
+            Category::query()->whereIn('id', $request->ids())->get(),
+            'taxonomy.categories.index',
+            'Category deleted.',
+            'categories deleted.',
+            'Categories could not be deleted because they are in use.'
+        );
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, Category>  $items
+     */
+    private function bulkDeleteRedirect($items, string $route, string $one, string $many, string $blockedMessage): RedirectResponse
+    {
+        $deleted = 0;
+        $blocked = 0;
+
+        foreach ($items as $item) {
+            try {
+                $item->delete();
+                $deleted++;
+            } catch (QueryException) {
+                $blocked++;
+            }
+        }
+
+        if ($deleted === 0) {
+            return redirect()->route($route)->with('danger', $blocked > 0 ? $blockedMessage : 'No records were deleted.');
+        }
+
+        $message = $deleted === 1 ? $one : $deleted.' '.$many;
+        if ($blocked > 0) {
+            $message .= ' '.$blockedMessage;
+        }
+
+        return redirect()->route($route)->with($blocked > 0 ? 'info' : 'danger', $message);
     }
 
     private function normalizeCodePrefix(string $prefix): string

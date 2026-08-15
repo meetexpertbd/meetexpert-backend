@@ -55,9 +55,12 @@
 
         <x-common.component-card title="All categories">
             <div class="admin-datatable rounded-xl border border-gray-200 dark:border-gray-800">
-                <table class="js-datatable min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                <table class="js-datatable min-w-full divide-y divide-gray-200 dark:divide-gray-800"
+                    data-bulk-url="{{ route('taxonomy.categories.bulk-destroy') }}"
+                    data-bulk-noun="category" data-bulk-noun-plural="categories">
                     <thead class="bg-gray-50 dark:bg-white/[0.03]">
                         <tr>
+                            <x-admin.dt-checkbox all />
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
                                 Name
                             </th>
@@ -81,6 +84,7 @@
                     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-white/[0.02]">
                         @foreach ($categories as $category)
                             <tr>
+                                <x-admin.dt-checkbox :id="$category->id" />
                                 <td class="px-5 py-4 text-sm text-gray-800 dark:text-white/90">
                                     {{ $category->name }}
                                 </td>

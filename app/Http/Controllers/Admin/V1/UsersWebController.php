@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\V1;
 
 use App\Http\Controllers\Controller;
 use App\Enums\RegistrationFrom;
+use App\Http\Requests\Admin\V1\BulkDestroyRequest;
 use App\Models\Category;
 use App\Models\User;
 use App\Services\ExpertApplicationService;
@@ -229,33 +230,6 @@ class UsersWebController extends Controller
             ->with('success', $user->name.' is now an expert.');
     }
 
-    public function allTypes(): View
-    {
-        $users = User::query()
-            ->orderBy('name')
-            ->get();
-
-        return view('pages.admin.users.all-types', [
-            'title' => 'All types users',
-            'users' => $users,
-        ]);
-    }
-
-    public function makeAdmin(User $user): RedirectResponse
-    {
-        if ($user->user_type === User::USER_TYPE_ADMIN) {
-            return redirect()
-                ->route('admin.all-users.index')
-                ->with('info', $user->name.' is already an admin.');
-        }
-
-        $user->update(['user_type' => User::USER_TYPE_ADMIN]);
-
-        return redirect()
-            ->route('admin.all-users.index')
-            ->with('success', $user->name.' is now an admin.');
-    }
-
     public function destroy(Request $request, User $user): RedirectResponse
     {
         if ($user->user_type !== User::USER_TYPE_USER) {
@@ -278,19 +252,25 @@ class UsersWebController extends Controller
             ->with('danger', $name.' deleted.');
     }
 
-    public function destroyAny(Request $request, User $user): RedirectResponse
+    public function bulkDestroy(BulkDestroyRequest $request): RedirectResponse
     {
-        if ($request->user()->is($user)) {
+        $users = User::query()
+            ->whereIn('id', $request->ids())
+            ->where('user_type', User::USER_TYPE_USER)
+            ->whereKeyNot($request->user()->id)
+            ->get();
+
+        $count = $users->count();
+        $users->each->delete();
+
+        if ($count === 0) {
             return redirect()
-                ->route('admin.all-users.index')
-                ->with('danger', 'You cannot delete your own account.');
+                ->route('admin.users.index')
+                ->with('danger', 'No users were deleted.');
         }
 
-        $name = $user->name;
-        $user->delete();
-
         return redirect()
-            ->route('admin.all-users.index')
-            ->with('danger', $name.' deleted.');
+            ->route('admin.users.index')
+            ->with('danger', $count === 1 ? 'User deleted.' : $count.' users deleted.');
     }
 }

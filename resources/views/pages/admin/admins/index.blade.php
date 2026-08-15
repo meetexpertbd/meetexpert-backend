@@ -9,15 +9,15 @@
 
 @section('content')
     <div x-data="{
-        createOpen: @json($createHasErrors && ! request()->routeIs('admin.users.apply-for-expert*')),
+        createOpen: @json($createHasErrors),
         async confirmDelete(e, name) {
             const form = e.target.closest('form');
             if (!form || !window.Swal) return;
             const { isConfirmed } = await window.Swal.fire({
-                title: 'Delete user?',
+                title: 'Delete admin?',
                 text: name
                     ? '“' + name + '” will be removed permanently.'
-                    : 'This user will be removed permanently.',
+                    : 'This admin will be removed permanently.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Yes, delete',
@@ -30,21 +30,21 @@
             if (isConfirmed) form.submit();
         }
     }" @keydown.escape.window="createOpen = false">
-        <x-common.page-breadcrumb pageTitle="Users" />
+        <x-common.page-breadcrumb pageTitle="Admins" />
 
         <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <p class="text-sm text-gray-500 dark:text-gray-400">Accounts with the standard user role (not experts or admins).</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Accounts with the admin role.</p>
             <button type="button" @click="createOpen = true"
                 class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 py-3 text-sm font-medium text-white hover:bg-brand-600">
-                Add user
+                Add admin
             </button>
         </div>
 
-        <x-common.component-card title="Users">
+        <x-common.component-card title="Admins">
             <div class="admin-datatable rounded-xl border border-gray-200 dark:border-gray-800">
                 <table class="js-datatable min-w-full divide-y divide-gray-200 dark:divide-gray-800"
-                    data-bulk-url="{{ route('admin.users.bulk-destroy') }}"
-                    data-bulk-noun="user" data-bulk-noun-plural="users">
+                    data-bulk-url="{{ route('admin.admins.bulk-destroy') }}"
+                    data-bulk-noun="admin" data-bulk-noun-plural="admins">
                     <thead class="bg-gray-50 dark:bg-white/[0.03]">
                         <tr>
                             <x-admin.dt-checkbox all />
@@ -57,38 +57,32 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-800 dark:bg-white/[0.02]">
-                        @foreach ($users as $user)
+                        @foreach ($admins as $admin)
                             <tr>
-                                <x-admin.dt-checkbox :id="$user->id" :disabled="auth()->user()?->is($user)" />
-                                <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">{{ $user->name }}</td>
-                                <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $user->email }}</td>
+                                <x-admin.dt-checkbox :id="$admin->id" :disabled="auth()->user()?->is($admin)" />
+                                <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">{{ $admin->name }}</td>
+                                <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">{{ $admin->email }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                    {{ $user->registration_from instanceof \BackedEnum ? str_replace('_', ' ', $user->registration_from->value) : ($user->registration_from ?? '—') }}
+                                    {{ $admin->registration_from instanceof \BackedEnum ? str_replace('_', ' ', $admin->registration_from->value) : ($admin->registration_from ?? '—') }}
                                 </td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                    {{ $user->email_verified_at?->format('M j, Y') ?? '—' }}</td>
+                                    {{ $admin->email_verified_at?->format('M j, Y') ?? '—' }}</td>
                                 <td class="px-5 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                    {{ $user->created_at?->format('M j, Y') }}</td>
+                                    {{ $admin->created_at?->format('M j, Y') }}</td>
                                 <td class="px-5 py-4 text-right text-sm">
-                                    <div class="inline-flex flex-wrap items-center justify-end gap-3">
-                                        @if (! $user->expert_applications_exists)
-                                            <a href="{{ route('admin.users.apply-for-expert', $user) }}"
-                                                class="font-medium text-brand-500 hover:text-brand-600">
-                                                Apply for expert
-                                            </a>
-                                        @else
-                                            <span class="text-xs text-gray-400 dark:text-gray-500">Application exists</span>
-                                        @endif
-                                        <form action="{{ route('admin.users.destroy', $user) }}" method="post" class="inline-block">
+                                    @if (auth()->user()?->is($admin))
+                                        <span class="text-xs text-gray-400 dark:text-gray-500">You</span>
+                                    @else
+                                        <form action="{{ route('admin.admins.destroy', $admin) }}" method="post" class="inline-block">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button"
                                                 class="font-medium text-red-600 hover:text-red-700 dark:text-red-400"
-                                                @click="confirmDelete($event, @js($user->name))">
+                                                @click="confirmDelete($event, @js($admin->name))">
                                                 Delete
                                             </button>
                                         </form>
-                                    </div>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach
@@ -120,8 +114,8 @@
                             fill="currentColor" />
                     </svg>
                 </button>
-                <h3 class="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">Add user</h3>
-                <form action="{{ route('admin.users.store') }}" method="post" class="space-y-5">
+                <h3 class="mb-6 text-lg font-medium text-gray-800 dark:text-white/90">Add admin</h3>
+                <form action="{{ route('admin.admins.store') }}" method="post" class="space-y-5">
                     @csrf
 
                     <div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\V1\BulkDestroyRequest;
 use App\Http\Requests\Admin\V1\ReviewExpertApplicationRequest;
 use App\Models\ExpertApplication;
 use App\Services\ExpertApplicationService;
@@ -72,5 +73,26 @@ class ExpertApplicationsWebController extends Controller
         return redirect()
             ->route('admin.expert-applications.index')
             ->with('danger', 'Application deleted.');
+    }
+
+    public function bulkDestroy(BulkDestroyRequest $request): RedirectResponse
+    {
+        $applications = ExpertApplication::query()->whereIn('id', $request->ids())->get();
+        $count = $applications->count();
+
+        foreach ($applications as $application) {
+            $application->skills()->detach();
+            $application->delete();
+        }
+
+        if ($count === 0) {
+            return redirect()
+                ->route('admin.expert-applications.index')
+                ->with('danger', 'No applications were deleted.');
+        }
+
+        return redirect()
+            ->route('admin.expert-applications.index')
+            ->with('danger', $count === 1 ? 'Application deleted.' : $count.' applications deleted.');
     }
 }

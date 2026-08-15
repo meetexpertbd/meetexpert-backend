@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\V1;
 
 use App\Enums\ExpertDetailStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\V1\BulkDestroyRequest;
 use App\Models\Category;
 use App\Models\User;
 use App\Services\ExpertDetailService;
@@ -239,6 +240,28 @@ class ExpertsWebController extends Controller
         return redirect()
             ->route('admin.experts.index')
             ->with('danger', $name.' deleted.');
+    }
+
+    public function bulkDestroy(BulkDestroyRequest $request): RedirectResponse
+    {
+        $experts = User::query()
+            ->whereIn('id', $request->ids())
+            ->where('user_type', User::USER_TYPE_EXPERT)
+            ->whereKeyNot($request->user()->id)
+            ->get();
+
+        $count = $experts->count();
+        $experts->each->delete();
+
+        if ($count === 0) {
+            return redirect()
+                ->route('admin.experts.index')
+                ->with('danger', 'No experts were deleted.');
+        }
+
+        return redirect()
+            ->route('admin.experts.index')
+            ->with('danger', $count === 1 ? 'Expert deleted.' : $count.' experts deleted.');
     }
 
     /**

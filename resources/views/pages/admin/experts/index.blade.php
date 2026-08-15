@@ -30,9 +30,12 @@
 
         <x-common.component-card title="All experts">
             <div class="admin-datatable rounded-xl border border-gray-200 dark:border-gray-800">
-                <table class="js-datatable min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+                <table class="js-datatable min-w-full divide-y divide-gray-200 dark:divide-gray-800"
+                    data-bulk-url="{{ route('admin.experts.bulk-destroy') }}"
+                    data-bulk-noun="expert" data-bulk-noun-plural="experts">
                     <thead class="bg-gray-50 dark:bg-white/[0.03]">
                         <tr>
+                            <x-admin.dt-checkbox all />
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Name</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Email</th>
                             <th class="px-5 py-3 text-left text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Expert code</th>
@@ -48,6 +51,7 @@
                                 $initial = strtoupper(mb_substr(trim($expert->name ?: '?'), 0, 1));
                             @endphp
                             <tr>
+                                <x-admin.dt-checkbox :id="$expert->id" :disabled="auth()->user()?->is($expert)" />
                                 <td class="px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90">
                                     <div class="flex items-center gap-3">
                                         @if ($avatarUrl)
